@@ -1,0 +1,122 @@
+[
+  {
+    "name": "modern-water",
+    "input_profile": {
+      "display_name": "Aster",
+      "gender": "female",
+      "birth_location": "Shanghai",
+      "style_profile": {
+        "fashion_style": "modern casual",
+        "spirit_style": "dreamy water"
+      },
+      "extra_payload": {
+        "personality_tags": ["calm", "observant"],
+        "scene_preference": "misty lakeside",
+        "free_text": "soft silhouette with layered accessories"
+      }
+    },
+    "expected_prompt_fragments": [
+      "Aster",
+      "modern casual",
+      "dreamy water",
+      "misty lakeside"
+    ],
+    "mock_llm_response": {
+      "version": "v1",
+      "character": {
+        "style": "modern casual",
+        "material": "matte fabric",
+        "pose_keywords": ["standing", "relaxed"],
+        "visual_keywords": ["layered", "soft light"],
+        "description": "A calm fashion-forward character."
+      },
+      "guardian_spirit": {
+        "style": "dreamy water",
+        "material": "translucent mist",
+        "pose_keywords": ["floating", "spiraling"],
+        "visual_keywords": ["ripple", "glow"],
+        "description": "A guardian spirit with flowing water energy."
+      }
+    }
+  },
+  {
+    "name": "ritual-fire",
+    "input_profile": {
+      "display_name": "Yan",
+      "gender": "male",
+      "birth_location": "Chengdu",
+      "style_profile": {
+        "fashion_style": "ritual formal",
+        "spirit_style": "ember phoenix"
+      },
+      "extra_payload": {
+        "personality_tags": ["decisive", "focused"],
+        "scene_preference": "temple courtyard",
+        "free_text": "ornamental sleeves and ceremonial posture"
+      }
+    },
+    "expected_prompt_fragments": [
+      "Yan",
+      "ritual formal",
+      "ember phoenix",
+      "temple courtyard"
+    ],
+    "mock_llm_response": {
+      "version": "v1",
+      "character": {
+        "style": "ritual formal",
+        "material": "embroidered silk",
+        "pose_keywords": ["upright", "ceremonial"],
+        "visual_keywords": ["gold trim", "structured layers"],
+        "description": "A composed ceremonial figure with ornate dress."
+      },
+      "guardian_spirit": {
+        "style": "ember phoenix",
+        "material": "burning feathers",
+        "pose_keywords": ["wings spread", "hovering"],
+        "visual_keywords": ["embers", "radiance"],
+        "description": "A guardian spirit rising like a phoenix of sparks."
+      }
+    }
+  },
+  {
+    "name": "forest-earth",
+    "input_profile": {
+      "display_name": "Lin",
+      "gender": "nonbinary",
+      "birth_location": "Hangzhou",
+      "style_profile": {
+        "fashion_style": "earth artisan",
+        "spirit_style": "forest guardian"
+      },
+      "extra_payload": {
+        "personality_tags": ["gentle", "grounded"],
+        "scene_preference": "mossy forest path",
+        "free_text": "natural fibers and hand-crafted details"
+      }
+    },
+    "expected_prompt_fragments": [
+      "Lin",
+      "earth artisan",
+      "forest guardian",
+      "mossy forest path"
+    ],
+    "mock_llm_response": {
+      "version": "v1",
+      "character": {
+        "style": "earth artisan",
+        "material": "woven linen",
+        "pose_keywords": ["walking", "steady"],
+        "visual_keywords": ["botanical motifs", "earth tones"],
+        "description": "A grounded artisan figure with natural texture."
+      },
+      "guardian_spirit": {
+        "style": "forest guardian",
+        "material": "bark and leaf light",
+        "pose_keywords": ["watching", "looming"],
+        "visual_keywords": ["moss", "wood grain"],
+        "description": "A protective spirit shaped by old forest energy."
+      }
+    }
+  }
+]

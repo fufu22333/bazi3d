@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bazi3d 个人主页</title>
+    <style>
+      :root {
+        --page-bg: #f4f6fb;
+        --panel-bg: rgba(255, 255, 255, 0.94);
+        --panel-border: #d7dce6;
+        --panel-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
+        --text-main: #111827;
+        --text-muted: #4b5563;
+        --accent: #0f766e;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        color: var(--text-main);
+        background:
+          radial-gradient(circle at top, rgba(209, 250, 229, 0.8), transparent 28%),
+          linear-gradient(180deg, #f8fafc 0%, var(--page-bg) 100%);
+      }
+
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .topbar nav {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .site-nav__link,
+      .site-nav__auth {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid #cbd5e1;
+        background: rgba(255, 255, 255, 0.84);
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .site-nav__link.is-current,
+      .site-nav__link[aria-current="page"] {
+        background: #111827;
+        border-color: #111827;
+        color: #ffffff;
+      }
+
+      .eyebrow {
+        margin: 0 0 6px;
+        color: var(--accent);
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+        gap: 20px;
+      }
+
+      .panel {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: var(--panel-shadow);
+      }
+
+      .stack,
+      #profile-works-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .meta-block,
+      .work-card {
+        border-radius: 14px;
+        padding: 14px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+      }
+
+      a {
+        color: inherit;
+        font: inherit;
+      }
+
+      .muted {
+        color: var(--text-muted);
+      }
+
+      @media (max-width: 960px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">个人主页</p>
+          <h1>我的作品</h1>
+        </div>
+        <nav class="site-nav" data-nav-root data-nav-page="profile" aria-label="主导航">
+          <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
+          <a class="site-nav__link" data-nav-link="gallery" href="./gallery.html">画廊</a>
+          <a class="site-nav__link" data-nav-link="profile" href="./profile.html">个人页</a>
+          <button class="site-nav__auth" data-nav-auth type="button">登录</button>
+        </nav>
+      </div>
+
+      <div class="layout">
+        <section class="panel stack">
+          <div>
+            <h2 id="profile-username">正在加载用户...</h2>
+            <p id="profile-email" class="muted">正在检查本地会话...</p>
+          </div>
+          <div class="meta-block">
+            <strong>状态</strong>
+            <p id="profile-status" class="muted">正在加载你的公开与私密作品...</p>
+          </div>
+        </section>
+
+        <section class="panel stack">
+          <div>
+            <h2>作品集合</h2>
+            <p class="muted">这个列表来自你已登录身份下的作品接口。</p>
+          </div>
+          <div id="profile-works-list"></div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="./js/nav.js"></script>
+    <script type="module" src="./js/profile.js"></script>
+  </body>
+</html>

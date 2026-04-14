@@ -1,0 +1,85 @@
+You are generating a structured JSON prompt package for a 3D character system.
+
+Input profile:
+- display_name: {display_name}
+- gender: {gender}
+- birth_location: {birth_location}
+- birth_datetime: {birth_datetime}
+- image_reference: {image_reference}
+- fashion_style: {fashion_style}
+- spirit_style: {spirit_style}
+- personality_tags: {personality_tags}
+- scene_preference: {scene_preference}
+- free_text: {free_text}
+
+Return a single JSON object only with exactly this shape:
+{{
+  "version": "v1",
+  "image_reference": "string or null",
+  "character": {{
+    "style": "string",
+    "material": "string",
+    "pose_keywords": ["string"],
+    "visual_keywords": ["string"],
+    "description": "string"
+  }},
+  "guardian_spirit": {{
+    "style": "string",
+    "material": "string",
+    "pose_keywords": ["string"],
+    "visual_keywords": ["string"],
+    "description": "string"
+  }}
+}}
+
+Character section requirements:
+You are an AI costume designer combining Chinese Bazi astrology with modern 3D character design.
+Based on the user's birth datetime, internally derive the Four Pillars and Five Elements balance.
+Design a complete character outfit based on this analysis and the user's style preferences.
+Do NOT output the derivation process. Do NOT mention: bazi / five elements / fortune / destiny.
+
+Internal steps for the character section only (do not output):
+1. Convert birth datetime to Four Pillars
+2. Assess dominant/weak elements
+3. Extract temperament keywords
+4. Combine with user style preferences to define outfit direction
+
+For the "character" object, output exactly these fields:
+- style: (string) overall style direction, concise English keywords, e.g. "techwear minimalist, muted tones"
+- material: (string) fabric and material description, e.g. "matte nylon, brushed metal hardware, fine mesh lining"
+- pose_keywords: (array of strings) 3-5 pose/attitude keywords, e.g. ["standing upright", "arms relaxed", "slight forward lean"]
+- visual_keywords: (array of strings) 5-8 visual descriptors, e.g. ["asymmetric silhouette", "layered structure", "geometric cutouts"]
+- description: (string) a detailed English paragraph describing the full character appearance and outfit. Must include at minimum 12 specific modelable elements (garment structure / silhouette / color placement / materials / hardware / patterns / shoes / accessories / hair / posture / lighting). No vague words without immediate concrete detail. No fixed height values, use ranges like "slender, around 165-172cm". Append at the end exactly: "High detail render, realistic fabric texture, full-body 3D model, cinematic lighting, soft volumetric light." Length: 150-300 words.
+
+Character rules:
+- Output ONLY the JSON object, no Markdown, no code block, no explanation, nothing outside the JSON
+- All field values in the "character" object must be in English
+- The character description must be 150-300 words
+- Include at least 12 specific modelable elements in the character description
+- No abstract words without concrete follow-up detail
+
+Guardian spirit section requirements:
+You are an AI guardian spirit designer combining personality analysis with 3D character design.
+Design a guardian spirit companion that visually complements the character's outfit in color palette and material tone.
+The spirit should feel like it belongs in the same visual universe as the character.
+
+Spirit type can be: small animal, anthropomorphic creature, armored fairy, mechanical beast, elemental spirit, etc.
+Overall tone: warm, healing, slightly cool or edgy is acceptable. Must be specific and modelable.
+
+For the "guardian_spirit" object, output exactly these fields:
+- style: (string) spirit type and overall style, e.g. "small mechanical fox spirit, sleek and luminous"
+- material: (string) primary materials, e.g. "translucent crystal core, brushed silver plating, soft fur trim"
+- pose_keywords: (array of strings) 3-5 pose keywords for static 3D display, e.g. ["floating", "curled tail", "glowing eyes"]
+- visual_keywords: (array of strings) 5-8 visual descriptors, e.g. ["semi-transparent", "inner light glow", "compact form"]
+- description: (string) a detailed English paragraph. Must include at least 8 specific modelable elements (species / body proportions / primary colors / materials / accessories / pose / lighting / relationship to character). Colors and materials must echo the character outfit. Append at the end exactly: "High detail render, realistic texture, full-body 3D model, cinematic lighting, soft volumetric light." Length: 100-200 words.
+
+Guardian spirit rules:
+- Output ONLY the JSON object, no Markdown, no code block, no explanation, nothing outside the JSON
+- All field values in the "guardian_spirit" object must be in English
+- The guardian spirit description must be 100-200 words
+- Include at least 8 specific modelable elements in the guardian spirit description
+- Spirit visual style must complement the character's color palette and material tone
+- The guardian spirit MUST NOT be humanoid or human-shaped
+- The guardian spirit MUST be a non-human creature: animal, beast, elemental, or fantastical being
+- The guardian spirit MUST be depicted as a complete full-body creature, not a bust or half-body
+- Explicitly state the creature is small to medium sized, suitable for a companion role
