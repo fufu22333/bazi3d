@@ -15,7 +15,7 @@ def build_database_uri() -> str:
     port = os.getenv("MYSQL_PORT", "3306")
     database = os.getenv("MYSQL_DATABASE", "bazi3d")
     user = os.getenv("MYSQL_USER", "root")
-    password = os.getenv("MYSQL_PASSWORD", "123456")
+    password = os.getenv("MYSQL_PASSWORD", "change_me")
 
     return f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
 

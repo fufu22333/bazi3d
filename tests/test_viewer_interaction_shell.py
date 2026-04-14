@@ -36,7 +36,7 @@ class ViewerInteractionShellSmokeTestCase(unittest.TestCase):
         self.assertIn("attachModelInteraction", interaction_js)
         self.assertIn("Raycaster", interaction_js)
         self.assertIn("pointerdown", interaction_js)
-        self.assertIn("model selected", interaction_js)
+        self.assertIn("emissive.setHex(0xaa5522)", interaction_js)
 
 
 if __name__ == "__main__":

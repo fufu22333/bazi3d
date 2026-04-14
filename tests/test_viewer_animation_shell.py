@@ -20,8 +20,8 @@ class ViewerAnimationShellSmokeTestCase(unittest.TestCase):
         self.assertIn('id="play-wave"', html)
         self.assertIn('id="motion-status"', html)
 
-        self.assertIn("AnimationMixer", animation_js)
         self.assertIn("createAnimationLayer", animation_js)
+        self.assertIn("hasModel", animation_js)
         self.assertIn("playClip", animation_js)
 
         self.assertIn("createAnimationLayer", main_js)

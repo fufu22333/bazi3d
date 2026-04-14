@@ -1,4 +1,5 @@
 import os
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -50,6 +51,59 @@ class DatabaseSessionTestCase(unittest.TestCase):
             engine.dispose()
 
         self.assertEqual(result, 1)
+
+    def test_in_memory_sqlite_session_is_shared_across_threads(self) -> None:
+        from backend.models import Base, SessionLocal, configure_session
+        from backend.models.generation_task import GenerationTask
+        from backend.models.input_profile import InputProfile
+        from backend.models.user import User
+
+        engine = configure_session("sqlite+pysqlite:///:memory:")
+        Base.metadata.create_all(engine)
+
+        session = SessionLocal()
+        user = User(
+            email="thread-db@example.com",
+            username="thread-db",
+            password_hash="hashed-password",
+        )
+        session.add(user)
+        session.commit()
+
+        profile = InputProfile(user_id=user.id)
+        session.add(profile)
+        session.commit()
+
+        task = GenerationTask(user_id=user.id, input_profile_id=profile.id)
+        session.add(task)
+        session.commit()
+        task_id = task.id
+        session.close()
+
+        result: dict[str, int | str | None] = {"task_id": None, "error": None}
+
+        def fetch_task() -> None:
+            worker_session = SessionLocal()
+            try:
+                fetched_task = worker_session.get(GenerationTask, task_id)
+                result["task_id"] = fetched_task.id if fetched_task else None
+            except Exception as exc:  # pragma: no cover - exercised in failing state
+                result["error"] = str(exc)
+            finally:
+                worker_session.close()
+                SessionLocal.remove()
+
+        thread = threading.Thread(target=fetch_task)
+        thread.start()
+        thread.join()
+
+        try:
+            self.assertIsNone(result["error"])
+            self.assertEqual(result["task_id"], task_id)
+        finally:
+            SessionLocal.remove()
+            Base.metadata.drop_all(engine)
+            engine.dispose()
 
 
 if __name__ == "__main__":
