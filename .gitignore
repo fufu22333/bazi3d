@@ -47,3 +47,12 @@ docs/superpowers/plans/2026-04-02-bazi3d-v1-implementation.md
 docs/superpowers/plans/2026-04-02-frontend-redesign-execution-plan.md
 
 docs/superpowers/plans/
+
+# Local private/generated artifacts.
+# These include private drafts, rendered pages, browser screenshots, local
+# evidence packages, temporary extraction outputs, and one-off helper scripts.
+output/
+tmp/
+tools/
+.playwright-cli/
+frontend/assets/demo-green-model-viewer.png

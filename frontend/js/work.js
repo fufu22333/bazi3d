@@ -22,6 +22,8 @@ const editVisibilityInput = document.getElementById("edit-visibility");
 const editAllowRemixInput = document.getElementById("edit-allow-remix");
 
 let currentWork = null;
+const params = new URLSearchParams(window.location.search);
+const demoModelNode = document.getElementById("work-demo-model");
 
 const viewerRuntime = createViewerRuntime({
   canvas: document.getElementById("viewer-canvas"),
@@ -119,6 +121,26 @@ function renderWorkDetail(work) {
   }
 }
 
+function renderDemoWorkDetail() {
+  renderWorkDetail({
+    id: 13,
+    title: "实现素材演示作品",
+    description: "基于规则化输入生成的人物模型资源，支持在 Web 查看器中查看模型效果。",
+    visibility: "public",
+    created_at: "2026-05-28 15:30",
+    allow_remix: false,
+    style_tags: ["现代休闲", "水光梦境", "Web 3D"],
+    author: {
+      id: 1,
+      username: "impl_user",
+    },
+    asset: null,
+  });
+  demoModelNode.classList.remove("is-hidden");
+  viewerRuntime.setStatus("演示作品资源已显示，可在右侧查看作品信息。");
+  managePanelNode.classList.add("is-hidden");
+}
+
 async function handleSaveSubmit(event) {
   event.preventDefault();
   if (!currentWork) {
@@ -157,6 +179,11 @@ async function handleDeleteClick() {
 }
 
 export async function loadWorkDetail() {
+  if (params.get("demo") === "1") {
+    renderDemoWorkDetail();
+    return;
+  }
+
   const workId = getWorkIdFromLocation();
   if (!workId) {
     statusNode.textContent = "缺少作品 ID。";

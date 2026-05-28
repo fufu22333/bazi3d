@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bazi3D 规则化输入采集</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111827;
+        --muted: #4b5563;
+        --line: #d8dee8;
+        --panel: rgba(255, 255, 255, 0.94);
+        --soft: #eef6f3;
+        --accent: #0f766e;
+        --dark: #111827;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(240, 253, 250, 0.9), rgba(248, 250, 252, 0.96) 34%),
+          #f5f7fb;
+      }
+
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 24px 18px 42px;
+      }
+
+      .topbar,
+      .site-nav,
+      .actions,
+      .chips {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .topbar {
+        justify-content: space-between;
+        margin-bottom: 22px;
+      }
+
+      .eyebrow {
+        margin: 0 0 6px;
+        color: var(--accent);
+        font-size: 14px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .site-nav__link,
+      .site-nav__auth,
+      button {
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .site-nav__link.is-current,
+      .site-nav__link[aria-current="page"],
+      button.primary {
+        background: var(--dark);
+        border-color: var(--dark);
+        color: #fff;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 20px 42px rgba(15, 23, 42, 0.08);
+      }
+
+      .form-grid,
+      .summary-grid,
+      form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 92px;
+        resize: vertical;
+      }
+
+      .chips label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: auto;
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        padding: 9px 12px;
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .step-card {
+        border: 1px solid #dbe4ee;
+        border-radius: 12px;
+        padding: 14px;
+        background: #f8fafc;
+      }
+
+      .step-card strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .handoff {
+        display: grid;
+        gap: 10px;
+        border-radius: 12px;
+        padding: 14px;
+        background: var(--soft);
+        border: 1px solid #bae6dd;
+      }
+
+      @media (max-width: 860px) {
+        .layout,
+        .field-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="screenshot-create-page">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">规则化输入采集</p>
+          <h1>Bazi3D 角色资料配置</h1>
+        </div>
+        <nav class="site-nav" data-nav-root data-nav-page="home" aria-label="主导航">
+          <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
+          <a class="site-nav__link" data-nav-link="gallery" href="./gallery.html">画廊</a>
+          <a class="site-nav__link" data-nav-link="profile" href="./profile.html">个人页</a>
+          <button class="site-nav__auth" data-nav-auth type="button">登录</button>
+        </nav>
+      </div>
+
+      <div class="layout">
+        <section class="panel">
+          <form id="rule-input-form">
+            <div>
+              <h2>输入角色基础档案</h2>
+              <p class="muted">该页面只负责采集规则化输入，并将字段整理为后端任务请求。</p>
+            </div>
+
+            <div class="field-grid">
+              <label>
+                展示名称
+                <input id="display-name" name="display_name" value="Ling Yuan RealChain" />
+              </label>
+              <label>
+                性别
+                <select id="gender" name="gender">
+                  <option value="female" selected>女</option>
+                  <option value="male">男</option>
+                  <option value="unknown">不限定</option>
+                </select>
+              </label>
+              <label>
+                出生地点
+                <input id="birth-location" name="birth_location" value="Shanghai" />
+              </label>
+              <label>
+                出生时间
+                <input id="birth-datetime" name="birth_datetime" type="datetime-local" value="1995-06-15T09:30" />
+              </label>
+            </div>
+
+            <label>
+              参考图片 URL
+              <input id="reference-image-url" name="reference_image_url" value="https://example.com/reference.png" />
+            </label>
+
+            <section class="form-grid" aria-labelledby="fashion-heading">
+              <h3 id="fashion-heading">外在风格</h3>
+              <div class="chips">
+                <label><input type="radio" name="fashion-style-option" value="minimalist" />极简风</label>
+                <label><input type="radio" name="fashion-style-option" value="modern_casual" checked />现代休闲</label>
+                <label><input type="radio" name="fashion-style-option" value="business_commute" />通勤商务</label>
+                <label><input type="radio" name="fashion-style-option" value="vintage_elegant" />复古优雅</label>
+                <label><input type="radio" name="fashion-style-option" value="techwear" />机能风</label>
+              </div>
+              <input id="fashion-style" name="fashion_style" value="modern_casual, clean silhouette, teal jacket, white sneakers" />
+            </section>
+
+            <section class="form-grid" aria-labelledby="spirit-heading">
+              <h3 id="spirit-heading">内在气质</h3>
+              <div class="chips">
+                <label><input type="radio" name="spirit-style-option" value="eastern_classical" checked />东方古韵</label>
+                <label><input type="radio" name="spirit-style-option" value="fire_cyberpunk" />火系赛博</label>
+                <label><input type="radio" name="spirit-style-option" value="water_dreamlike" />水光梦境</label>
+                <label><input type="radio" name="spirit-style-option" value="earth_balance" />大地平衡</label>
+              </div>
+              <input id="spirit-style" name="spirit_style" value="eastern_classical, water light aura, balanced guardian motif" />
+            </section>
+
+            <label>
+              生成补充说明
+              <textarea id="extra-note">强调轻量化三维角色、清晰服饰层次和可在 Web 查看器中展示的 GLB 资源。</textarea>
+            </label>
+
+            <div class="actions">
+              <button class="primary" id="submit-task" type="submit">提交生成任务</button>
+              <button id="fill-demo" type="button">恢复演示数据</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="panel summary-grid">
+          <div>
+            <h2>字段映射预览</h2>
+              <p class="muted">该侧栏展示输入数据如何进入任务创建接口。</p>
+          </div>
+          <div class="step-card">
+            <strong>1. 基础档案</strong>
+            <p id="profile-summary" class="muted">展示名称、性别、出生地和出生时间将写入 input profile。</p>
+          </div>
+          <div class="step-card">
+            <strong>2. 风格画像</strong>
+            <p id="style-summary" class="muted">外在风格与内在气质将映射到 style_profile。</p>
+          </div>
+          <div class="step-card">
+            <strong>3. 任务请求</strong>
+            <p id="submit-status" class="muted">点击提交后调用 /api/tasks 创建生成任务。</p>
+          </div>
+          <div class="handoff">
+            <strong>提交去向</strong>
+            <p class="muted">确认信息后，系统会创建生成任务并进入任务跟踪流程。</p>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <script type="module" src="./js/nav.js"></script>
+    <script type="module" src="./js/create-page.js"></script>
+  </body>
+</html>

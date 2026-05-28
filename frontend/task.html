@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bazi3D 生成任务跟踪</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111827;
+        --muted: #4b5563;
+        --line: #d8dee8;
+        --panel: #ffffff;
+        --accent: #2563eb;
+        --success: #047857;
+        --dark: #111827;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        color: var(--ink);
+        background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 34%, #f3f4f6 100%);
+      }
+
+      main {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 24px 18px 42px;
+      }
+
+      .topbar,
+      .site-nav,
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .topbar {
+        margin-bottom: 22px;
+      }
+
+      .site-nav {
+        justify-content: flex-start;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .eyebrow {
+        margin-bottom: 6px;
+        color: var(--accent);
+        font-size: 14px;
+      }
+
+      .site-nav__link,
+      .site-nav__auth,
+      button,
+      input {
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .site-nav__link.is-current,
+      .site-nav__link[aria-current="page"],
+      button.primary {
+        background: var(--dark);
+        border-color: var(--dark);
+        color: #fff;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 20px 42px rgba(15, 23, 42, 0.08);
+      }
+
+      .metric-grid,
+      #task-timeline,
+      .asset-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-top: 16px;
+      }
+
+      .metric,
+      .timeline-item,
+      .asset-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #f8fafc;
+        padding: 14px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 26px;
+      }
+
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 26px minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--success);
+        margin-top: 4px;
+      }
+
+      .dot.is-pending {
+        background: #f59e0b;
+      }
+
+      .dot.is-idle {
+        background: #94a3b8;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .status-banner {
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 14px;
+        background: #eff6ff;
+      }
+
+      @media (max-width: 860px) {
+        .layout,
+        .metric-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="screenshot-task-page">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">生成任务跟踪</p>
+          <h1>任务生命周期与资源状态</h1>
+        </div>
+        <nav class="site-nav" data-nav-root data-nav-page="home" aria-label="主导航">
+          <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
+          <a class="site-nav__link" data-nav-link="gallery" href="./gallery.html">画廊</a>
+          <a class="site-nav__link" data-nav-link="profile" href="./profile.html">个人页</a>
+          <button class="site-nav__auth" data-nav-auth type="button">登录</button>
+        </nav>
+      </div>
+
+      <div class="layout">
+        <section class="panel" id="task-state-panel">
+          <div class="toolbar">
+            <div>
+              <h2 id="task-title">任务 #13</h2>
+              <p id="task-status" class="muted">已完成，人物模型资源已返回。</p>
+            </div>
+            <label>
+              <span class="muted">任务 ID</span>
+              <input id="task-id-input" value="13" />
+            </label>
+            <button class="primary" id="load-task" type="button">查询任务</button>
+            <button id="toggle-demo-status" type="button">切换处理中</button>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="muted">请求阶段</span>
+              <strong id="request-count">1</strong>
+            </div>
+            <div class="metric">
+              <span class="muted">任务状态</span>
+              <strong id="status-label">完成</strong>
+            </div>
+            <div class="metric">
+              <span class="muted">资源数量</span>
+              <strong id="asset-count">2</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>处理过程</h2>
+          <div id="task-timeline" aria-live="polite">
+            <article class="timeline-item">
+              <span class="dot"></span>
+              <div>
+                <h3>提交规则化输入</h3>
+                <p class="muted">前端将基础资料与风格画像提交到 /api/tasks。</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <span class="dot"></span>
+              <div>
+                <h3>生成提示文本</h3>
+                <p class="muted">后端根据 input profile 组织人物与守护灵生成提示。</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <span class="dot"></span>
+              <div>
+                <h3>返回模型资源</h3>
+                <p class="muted">任务完成后返回可供查看器加载的 GLB 资源地址。</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>资源输出</h2>
+          <div id="asset-list" class="asset-list">
+            <article class="asset-card">
+              <h3>人物模型</h3>
+              <p class="muted">character.glb - 用于模型查看器加载人物形象。</p>
+            </article>
+            <article class="asset-card">
+              <h3>守护灵模型</h3>
+              <p class="muted">guardian.glb - 用于展示扩展生成结果。</p>
+            </article>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <div class="status-banner">
+            <h2>状态说明</h2>
+            <p class="muted">任务完成后，人物模型和守护灵模型会作为资源输出，供查看器加载。</p>
+          </div>
+        </aside>
+      </div>
+    </main>
+    <script type="module" src="./js/nav.js"></script>
+    <script type="module" src="./js/task-page.js"></script>
+  </body>
+</html>

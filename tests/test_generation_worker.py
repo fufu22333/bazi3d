@@ -1,5 +1,7 @@
 import unittest
+import tempfile
 from datetime import datetime
+from pathlib import Path
 from unittest.mock import patch
 
 
@@ -156,6 +158,68 @@ class GenerationWorkerTestCase(unittest.TestCase):
         self.assertEqual(stored_task.spirit_task_ref, "job-2")
         self.assertEqual([asset.asset_type for asset in assets], ["character", "guardian_spirit"])
         self.assertEqual(len(fake_adapter.submitted_prompts), 2)
+
+    def test_character_prompt_front_loads_full_body_constraints(self) -> None:
+        from backend.adapters.hunyuan3d_adapter import Hunyuan3DAdapter
+        from backend.services.generation_worker import _build_asset_prompt
+
+        section = FakePromptSection(
+            style="minimalist water dreamlike, muted tones",
+            material="matte crepe, translucent organza, brushed silver hardware",
+            pose_keywords=["standing upright", "arms relaxed"],
+            visual_keywords=["asymmetric silhouette", "soft draping"],
+            description=(
+                "The character stands with a slender, elegant frame, approximately 165-172cm tall. "
+                "The outfit features an asymmetric top with a single long sleeve in matte crepe, "
+                "layered over a translucent organza underlayer that catches light softly. "
+                "The left shoulder is bare, with a thin brushed silver strap. "
+                "The waist is cinched by a wide belt of matte black leather with a geometric silver buckle. "
+                "High-waisted wide-leg trousers in the same crepe fabric flow down to brush the floor. "
+                "Shoes are simple low-heeled mules in matte charcoal leather. "
+                "High detail render, realistic fabric texture, full-body 3D model, cinematic lighting."
+            ),
+        )
+
+        prompt = _build_asset_prompt(
+            "character",
+            section,
+            {
+                "display_name": "Aster",
+                "gender": "female",
+                "birth_location": "Shanghai",
+                "birth_datetime": "1995-06-15T09:30",
+            },
+        )
+        submitted_prompt = Hunyuan3DAdapter._truncate_prompt(prompt)
+
+        self.assertIn("full-body", submitted_prompt)
+        self.assertIn("not a bust", submitted_prompt)
+        self.assertIn("not a half-body", submitted_prompt)
+        self.assertIn("feet and footwear", submitted_prompt)
+
+    def test_successful_run_writes_prompt_debug_artifact(self) -> None:
+        from backend.services.generation_worker import run_generation_task
+
+        fake_adapter = FakeAdapter()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.app.app_context():
+                self.app.config["PROMPT_DEBUG_DIR"] = temp_dir
+                with patch(
+                    "backend.services.generation_worker._create_llm_client",
+                    return_value=FakeLlmClient(),
+                ), patch(
+                    "backend.services.generation_worker._build_provider_registry",
+                    return_value=FakeRegistry(fake_adapter),
+                ):
+                    run_generation_task(self.task_id)
+
+            debug_path = Path(temp_dir) / f"task-{self.task_id}-prompts.json"
+            self.assertTrue(debug_path.exists())
+            debug_text = debug_path.read_text(encoding="utf-8")
+            self.assertIn('"prompt_output"', debug_text)
+            self.assertIn('"asset_prompts"', debug_text)
+            self.assertIn("Create a high-quality stylized 3D character", debug_text)
 
     def test_failed_run_marks_task_failed_without_assets(self) -> None:
         from backend.models import SessionLocal

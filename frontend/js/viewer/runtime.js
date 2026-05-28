@@ -41,7 +41,10 @@ export function createViewerRuntime({
   const loader = new GLTFLoader();
   const textureLoader = new THREE.TextureLoader();
   const clock = new THREE.Clock();
-  const animationLayer = createAnimationLayer(motionStatusNode);
+  const animationLayer = createAnimationLayer({
+    motionStatusNode,
+    interactionStatusNode,
+  });
   let currentModel = null;
 
   function formatResourceLabel(value) {
