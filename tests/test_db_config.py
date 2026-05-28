@@ -15,7 +15,7 @@ class DatabaseConfigTestCase(unittest.TestCase):
 
         self.assertEqual(
             config["SQLALCHEMY_DATABASE_URI"],
-            "mysql+pymysql://root:change_me@127.0.0.1:3306/bazi3d",
+            "mysql+pymysql://root:change_me@127.0.0.1:3306/bazi3d?charset=utf8mb4",
         )
 
     def test_database_uri_can_be_overridden_by_environment(self) -> None:
@@ -34,7 +34,7 @@ class DatabaseConfigTestCase(unittest.TestCase):
 
         self.assertEqual(
             config["SQLALCHEMY_DATABASE_URI"],
-            "mysql+pymysql://demo:secret@db.internal:3307/custom_db",
+            "mysql+pymysql://demo:secret@db.internal:3307/custom_db?charset=utf8mb4",
         )
 
 

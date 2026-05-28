@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 class ProfilePageShellSmokeTestCase(unittest.TestCase):
-    def test_profile_page_and_data_hooks_exist(self) -> None:
+    def test_profile_page_and_management_hooks_exist(self) -> None:
         html_path = Path("frontend/profile.html")
         script_path = Path("frontend/js/profile.js")
         api_path = Path("frontend/js/api.js")
@@ -23,8 +23,13 @@ class ProfilePageShellSmokeTestCase(unittest.TestCase):
         self.assertIn('id="profile-username"', html)
         self.assertIn('id="profile-email"', html)
         self.assertIn('id="profile-works-list"', html)
-        self.assertIn("我的作品", html)
-        self.assertIn("作品集合", html)
+        self.assertIn('id="profile-work-count"', html)
+        self.assertIn('id="profile-public-count"', html)
+        self.assertIn('id="profile-asset-count"', html)
+        self.assertIn("我的作品管理", html)
+        self.assertIn("作品管理台", html)
+        self.assertIn("已发布作品", html)
+        self.assertIn("管理说明", html)
 
         self.assertIn("fetchMyWorks", api_script)
         self.assertIn("getStoredUser", api_script)
@@ -33,9 +38,13 @@ class ProfilePageShellSmokeTestCase(unittest.TestCase):
         self.assertIn("loadProfilePage", script)
         self.assertIn("fetchMyWorks", script)
         self.assertIn("profile-works-list", script)
+        self.assertIn("profile-work-count", script)
+        self.assertIn("profile-public-count", script)
+        self.assertIn("profile-asset-count", script)
+        self.assertIn("work-row", script)
+        self.assertIn('autoload: "1"', script)
         self.assertIn("work.html?id=", script)
-        self.assertIn("已登录用户", script)
-        self.assertIn("加载你的作品", script)
+        self.assertNotIn("毕业论文", script)
 
 
 if __name__ == "__main__":
