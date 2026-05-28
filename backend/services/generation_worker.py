@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 import logging
 import traceback
+from pathlib import Path
 from typing import Any
 
 from flask import current_app
@@ -51,8 +53,20 @@ def _build_asset_prompt(asset_key: str, section, input_profile: dict[str, Any]) 
     visual_keywords = ", ".join(section.visual_keywords)
 
     role_label = "3D character" if asset_key == "character" else "guardian spirit"
+    geometry_constraints = (
+        "Mandatory geometry constraints: complete full-body human figure from head to feet; "
+        "visible full legs, feet and footwear; standing full-body composition; "
+        "not a bust; not a half-body; not a portrait; not cropped at waist or knees."
+        if asset_key == "character"
+        else (
+            "Mandatory geometry constraints: complete full-body non-human companion creature; "
+            "visible head, torso, limbs or paws, and tail if present; not a bust; "
+            "not a half-body; not a portrait; not cropped."
+        )
+    )
     return (
         f"Create a high-quality stylized {role_label} as a GLB-ready 3D model.\n"
+        f"{geometry_constraints}\n"
         f"Subject name: {display_name}\n"
         f"Gender presentation: {gender}\n"
         f"Birth location: {birth_location}\n"
@@ -63,6 +77,43 @@ def _build_asset_prompt(asset_key: str, section, input_profile: dict[str, Any]) 
         f"Visual keywords: {visual_keywords}\n"
         f"Description: {section.description}\n"
         "Output should emphasize complete character silhouette, readable forms, and clean 3D details."
+    )
+
+
+def _prompt_output_to_dict(prompt_output: Any) -> dict[str, Any]:
+    if hasattr(prompt_output, "model_dump"):
+        return prompt_output.model_dump()
+    if hasattr(prompt_output, "dict"):
+        return prompt_output.dict()
+    return dict(prompt_output)
+
+
+def _prompt_for_submit(adapter, prompt: str) -> str:
+    truncate = getattr(adapter, "_truncate_prompt", None)
+    if callable(truncate):
+        return truncate(prompt)
+    return prompt
+
+
+def _write_prompt_debug_artifact(
+    *,
+    task_id: int,
+    input_profile: dict[str, Any],
+    prompt_output,
+    asset_prompts: dict[str, dict[str, str]],
+) -> None:
+    debug_dir = current_app.config.get("PROMPT_DEBUG_DIR") or "output/debug_prompts"
+    path = Path(debug_dir)
+    path.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "task_id": task_id,
+        "input_profile": input_profile,
+        "prompt_output": _prompt_output_to_dict(prompt_output),
+        "asset_prompts": asset_prompts,
+    }
+    (path / f"task-{task_id}-prompts.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
     )
 
 
@@ -142,9 +193,24 @@ def run_generation_task(task_id: int) -> GenerationTask:
         adapter = provider_registry.get(PROVIDER_KEY)
 
         normalized_assets: list[tuple[str, str, dict[str, Any]]] = []
+        asset_prompts: dict[str, dict[str, str]] = {}
         for asset_type, prompt_field in ASSET_PROMPT_FIELDS.items():
             section = getattr(prompt_output, prompt_field)
             prompt = _build_asset_prompt(asset_type, section, input_profile)
+            asset_prompts[asset_type] = {
+                "full_prompt": prompt,
+                "submitted_prompt": _prompt_for_submit(adapter, prompt),
+            }
+
+        _write_prompt_debug_artifact(
+            task_id=task.id,
+            input_profile=input_profile,
+            prompt_output=prompt_output,
+            asset_prompts=asset_prompts,
+        )
+
+        for asset_type in ASSET_PROMPT_FIELDS:
+            prompt = asset_prompts[asset_type]["full_prompt"]
             job_id = adapter.submit_job(prompt)
             raw_result = adapter.query_job(job_id)
             normalized = safe_normalize_model_output(
