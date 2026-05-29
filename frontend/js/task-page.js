@@ -8,6 +8,7 @@ const statusLabelNode = document.getElementById("status-label");
 const assetCountNode = document.getElementById("asset-count");
 const timelineNode = document.getElementById("task-timeline");
 const assetListNode = document.getElementById("asset-list");
+let pollTimer = null;
 
 const statusLabels = {
   pending: "处理中",
@@ -23,6 +24,14 @@ function resolveTaskId() {
     window.localStorage.getItem("bazi3d.lastTaskId") ||
     taskIdInput.value.trim()
   );
+}
+
+function updateReturnToCreateLink(taskId) {
+  const homeLink = document.querySelector('[data-nav-link="home"]');
+  if (!homeLink || !taskId) {
+    return;
+  }
+  homeLink.href = `./index.html?taskId=${encodeURIComponent(taskId)}`;
 }
 
 function renderTimeline(status) {
@@ -98,12 +107,38 @@ function renderAssets(assets = []) {
 function renderTask(task) {
   const assets = Array.isArray(task.assets) ? task.assets : [];
   taskIdInput.value = task.id || resolveTaskId();
+  window.localStorage.setItem("bazi3d.lastTaskId", String(taskIdInput.value));
+  updateReturnToCreateLink(taskIdInput.value);
   taskTitleNode.textContent = `任务 #${taskIdInput.value}`;
   taskStatusNode.textContent = `当前状态：${statusLabels[task.status] || task.status || "未知"}。`;
   statusLabelNode.textContent = statusLabels[task.status] || "未知";
   assetCountNode.textContent = String(assets.length);
   renderTimeline(task.status || "pending");
   renderAssets(assets);
+}
+
+function stopTaskPolling() {
+  if (!pollTimer) {
+    return;
+  }
+  window.clearInterval(pollTimer);
+  pollTimer = null;
+}
+
+function startTaskPolling(taskId, token) {
+  stopTaskPolling();
+  pollTimer = window.setInterval(async () => {
+    try {
+      const task = await fetchTask(token, taskId);
+      renderTask(task);
+      if (task.status === "completed" || task.status === "failed") {
+        stopTaskPolling();
+      }
+    } catch (error) {
+      stopTaskPolling();
+      taskStatusNode.textContent = error.message || "任务轮询失败。";
+    }
+  }, 2000);
 }
 
 function renderDemoTask() {
@@ -131,7 +166,13 @@ async function loadTask() {
 
   taskStatusNode.textContent = `正在查询任务 #${taskId}...`;
   try {
-    renderTask(await fetchTask(token, taskId));
+    const task = await fetchTask(token, taskId);
+    renderTask(task);
+    if (task.status === "pending") {
+      startTaskPolling(task.id, token);
+    } else {
+      stopTaskPolling();
+    }
   } catch (error) {
     taskStatusNode.textContent = error.message || "任务查询失败，已显示演示状态。";
     renderDemoTask();

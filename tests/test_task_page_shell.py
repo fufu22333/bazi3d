@@ -32,9 +32,11 @@ class TaskPageShellSmokeTestCase(unittest.TestCase):
         self.assertIn('id="reference-image-url"', html)
         self.assertIn('id="fashion-style"', html)
         self.assertIn('id="spirit-style"', html)
+        self.assertIn('id="extra-note"', html)
         self.assertIn('id="task-status"', html)
         self.assertIn('id="task-meta"', html)
         self.assertIn('id="task-hint"', html)
+        self.assertIn('id="task-detail-link"', html)
         self.assertNotIn('id="auth-token"', html)
         self.assertIn('data-nav-root', html)
         self.assertNotIn('id="auth-link"', html)
@@ -49,6 +51,13 @@ class TaskPageShellSmokeTestCase(unittest.TestCase):
         self.assertIn("autoLoadCompletedCharacter", viewer_script)
         self.assertIn('resourceTypeSelect.value = "person"', viewer_script)
         self.assertIn("reference_image_url", viewer_script)
+        self.assertIn("free_text", viewer_script)
+        self.assertIn("extraNoteInput", viewer_script)
+        self.assertIn("taskDetailLink", viewer_script)
+        self.assertIn("task.html?taskId=", viewer_script)
+        self.assertIn("restoreTaskFromNavigation", viewer_script)
+        self.assertIn('initialParams.get("taskId")', viewer_script)
+        self.assertIn("hydrateFormFromTask", viewer_script)
         self.assertIn("requireAuth", viewer_script)
         self.assertIn("renderTaskState", viewer_script)
         self.assertIn("setResultPlaceholder", viewer_script)
@@ -56,6 +65,16 @@ class TaskPageShellSmokeTestCase(unittest.TestCase):
         self.assertNotIn("logoutButton", viewer_script)
         self.assertIn("提交任务", html)
         self.assertIn("尚未生成资源", html)
+
+    def test_task_page_preserves_task_context_when_returning_home(self) -> None:
+        nav_script = Path("frontend/js/nav.js").read_text(encoding="utf-8")
+        task_script = Path("frontend/js/task-page.js").read_text(encoding="utf-8")
+
+        self.assertIn("resolveLastTaskId", nav_script)
+        self.assertIn("withTaskContext", nav_script)
+        self.assertIn("bazi3d.lastTaskId", nav_script)
+        self.assertIn("updateReturnToCreateLink", task_script)
+        self.assertIn('data-nav-link="home"', task_script)
 
 
 if __name__ == "__main__":
