@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>bazi3d 创建器</title>
+    <title>3D形象创建器</title>
     <style>
       :root {
         color-scheme: light;
@@ -294,20 +294,32 @@
         display: none;
       }
 
+      .is-hidden {
+        display: none;
+      }
+
       input,
       select,
+      textarea,
       button {
         font: inherit;
       }
 
       input,
-      select {
+      select,
+      textarea {
         width: 100%;
         box-sizing: border-box;
         padding: 10px 12px;
         border: 1px solid #cbd5e1;
         border-radius: 12px;
         background: #ffffff;
+      }
+
+      textarea {
+        min-height: 92px;
+        resize: vertical;
+        line-height: 1.5;
       }
 
       #viewer-canvas {
@@ -359,7 +371,7 @@
       <div class="topbar">
         <div>
           <p class="eyebrow">创建</p>
-          <h1>Bazi3D 角色塑造台</h1>
+          <h1>3D形象创建台</h1>
         </div>
         <nav class="site-nav" data-nav-root data-nav-page="home" aria-label="主导航">
           <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
@@ -412,6 +424,10 @@
                 <label>
                   参考图片 URL
                   <input id="reference-image-url" type="url" placeholder="https://example.com/reference.png" />
+                </label>
+                <label>
+                  生成补充说明
+                  <textarea id="extra-note" placeholder="补充服饰层次、姿态、场景或希望强调的生成细节。"></textarea>
                 </label>
               </section>
 
@@ -471,6 +487,7 @@
                 <strong>任务提示</strong>
                 <div id="task-hint">提交表单后即可创建任务。如果资源暂未返回，结果区域会继续显示占位提示。</div>
               </div>
+              <a id="task-detail-link" class="inline-link is-hidden" href="./task.html">查看任务详情页</a>
             </div>
           </section>
         </div>

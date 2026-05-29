@@ -73,6 +73,7 @@ def create_task_for_user(user: User, payload: dict) -> GenerationTask:
         session.add(task)
         session.commit()
         session.refresh(task)
+        task.input_profile
         task.model_assets
         session.expunge(task)
     finally:
@@ -83,10 +84,23 @@ def create_task_for_user(user: User, payload: dict) -> GenerationTask:
 
 
 def serialize_task(task: GenerationTask) -> dict:
+    profile = task.input_profile
     return {
         "id": task.id,
         "status": task.status,
         "provider": task.provider,
+        "input_profile": {
+            "display_name": profile.display_name,
+            "gender": profile.gender,
+            "birth_datetime": profile.birth_datetime.isoformat()
+            if profile.birth_datetime
+            else None,
+            "calendar_type": profile.calendar_type,
+            "birth_location": profile.birth_location,
+            "style_profile": profile.style_profile or {},
+            "extra_payload": profile.extra_payload or {},
+            "reference_image_url": profile.reference_image_url,
+        },
         "assets": [
             {
                 "id": asset.id,
@@ -112,6 +126,7 @@ def get_task_for_user(task_id: int, user: User) -> GenerationTask | None:
         )
         if task is None:
             return None
+        task.input_profile
         task.model_assets
         session.expunge(task)
         return task

@@ -17,7 +17,7 @@ def build_database_uri() -> str:
     user = os.getenv("MYSQL_USER", "root")
     password = os.getenv("MYSQL_PASSWORD", "change_me")
 
-    return f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+    return f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}?charset=utf8mb4"
 
 
 def get_config() -> dict:

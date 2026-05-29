@@ -55,6 +55,16 @@ class TaskApiTestCase(unittest.TestCase):
         self.assertEqual(fetch_payload["id"], task_id)
         self.assertEqual(fetch_payload["status"], "pending")
         self.assertEqual(fetch_payload["assets"], [])
+        self.assertEqual(fetch_payload["input_profile"]["display_name"], "Aster")
+        self.assertEqual(fetch_payload["input_profile"]["birth_location"], "Shanghai")
+        self.assertEqual(
+            fetch_payload["input_profile"]["style_profile"]["fashion_style"],
+            "modern casual",
+        )
+        self.assertEqual(
+            fetch_payload["input_profile"]["extra_payload"]["scene_preference"],
+            "misty lakeside",
+        )
 
 
 if __name__ == "__main__":

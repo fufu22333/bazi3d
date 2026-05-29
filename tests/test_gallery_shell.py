@@ -21,10 +21,16 @@ class GalleryShellSmokeTestCase(unittest.TestCase):
 
         self.assertIn('id="gallery-list"', html)
         self.assertIn('id="gallery-status"', html)
+        self.assertIn('class="gallery-grid"', html)
+        self.assertIn("作品广场", html)
+        self.assertIn("公开作品集", html)
         self.assertIn("fetchWorks", api_script)
         self.assertIn("renderWorks", script)
-        self.assertIn("index.html?", script)
+        self.assertIn("gallery-grid", script)
+        self.assertIn("viewer.html?", script)
+        self.assertIn('autoload: "1"', script)
         self.assertIn("URLSearchParams", viewer_script)
+        self.assertNotIn("毕业论文", script)
 
 
 if __name__ == "__main__":

@@ -19,12 +19,14 @@ const genderInput = document.getElementById("gender");
 const birthLocationInput = document.getElementById("birth-location");
 const birthDateTimeInput = document.getElementById("birth-datetime");
 const referenceImageUrlInput = document.getElementById("reference-image-url");
+const extraNoteInput = document.getElementById("extra-note");
 const fashionStyleInput = document.getElementById("fashion-style");
 const spiritStyleInput = document.getElementById("spirit-style");
 const resetTaskFormButton = document.getElementById("reset-task-form");
 const taskStatusNode = document.getElementById("task-status");
 const taskMetaNode = document.getElementById("task-meta");
 const taskHintNode = document.getElementById("task-hint");
+const taskDetailLink = document.getElementById("task-detail-link");
 const skyboxUrlInput = document.getElementById("skybox-url");
 const motionStatusNode = document.getElementById("motion-status");
 const playIdleButton = document.getElementById("play-idle");
@@ -221,6 +223,12 @@ function renderTaskState({ status, taskId = null, hasAssets = false, note = "" }
   taskMetaNode.textContent = taskId
     ? `任务 #${taskId}${hasAssets ? " 已返回查看器资源。" : " 仍在等待查看器资源。"}`
     : "尚未提交任务。";
+  if (taskId) {
+    taskDetailLink.href = `./task.html?taskId=${encodeURIComponent(taskId)}`;
+    taskDetailLink.classList.remove("is-hidden");
+  } else {
+    taskDetailLink.classList.add("is-hidden");
+  }
 
   if (note) {
     taskHintNode.textContent = note;
@@ -335,6 +343,58 @@ function buildLoaderUrl(modelSource) {
     return modelSource.url;
   }
   return `/api/proxy/glb?url=${encodeURIComponent(modelSource.url)}`;
+}
+
+function hydrateFormFromTask(task) {
+  const profile = task.input_profile || {};
+  const styleProfile = profile.style_profile || {};
+  const extraPayload = profile.extra_payload || {};
+
+  displayNameInput.value = profile.display_name || "";
+  genderInput.value = profile.gender || "";
+  birthLocationInput.value = profile.birth_location || "";
+  birthDateTimeInput.value = (
+    profile.birth_datetime ||
+    extraPayload.birth_datetime ||
+    ""
+  ).slice(0, 16);
+  referenceImageUrlInput.value = profile.reference_image_url || "";
+  fashionStyleInput.value = styleProfile.fashion_style || "";
+  spiritStyleInput.value = styleProfile.spirit_style || "";
+  extraNoteInput.value = extraPayload.free_text || "";
+  renderChatMessages();
+}
+
+async function restoreTaskFromNavigation() {
+  const taskId = initialParams.get("taskId");
+  if (!taskId || !authToken) {
+    return false;
+  }
+
+  try {
+    const task = await fetchTask(authToken, taskId);
+    window.localStorage.setItem("bazi3d.lastTaskId", String(task.id));
+    hydrateFormFromTask(task);
+    renderTaskState({
+      status: task.status,
+      taskId: task.id,
+      hasAssets: Array.isArray(task.assets) && task.assets.length > 0,
+    });
+    syncAssetsToViewer(task.assets, {
+      autoLoadCompletedCharacter: task.status === "completed",
+    });
+    if (task.status === "pending") {
+      startTaskPolling(authToken, task.id);
+    }
+    return true;
+  } catch (error) {
+    setTaskStatusError("任务恢复失败。");
+    taskMetaNode.textContent = `任务 #${taskId}`;
+    taskHintNode.textContent =
+      error.message || "无法恢复该任务，请从任务详情页重新进入。";
+    console.error(error);
+    return false;
+  }
 }
 
 function hydrateViewerFromQuery() {
@@ -479,6 +539,7 @@ async function handleTaskSubmit(event) {
     },
     extra_payload: {
       birth_datetime: birthDateTimeInput.value || null,
+      free_text: extraNoteInput.value.trim(),
     },
   };
 
@@ -489,6 +550,8 @@ async function handleTaskSubmit(event) {
 
   try {
     const task = await createTask(token, payload);
+    window.localStorage.setItem("bazi3d.lastTaskId", String(task.id));
+    window.history.replaceState(null, "", `./index.html?taskId=${encodeURIComponent(task.id)}`);
     renderTaskState({
       status: task.status,
       taskId: task.id,
@@ -524,6 +587,8 @@ function bindStyleChipGroup(groupName, targetInput) {
 
 function resetCreateForm() {
   taskForm.reset();
+  window.localStorage.removeItem("bazi3d.lastTaskId");
+  window.history.replaceState(null, "", "./index.html");
   clearResourceFileSelection("person");
   clearResourceFileSelection("guardian");
   renderTaskState({
@@ -646,6 +711,10 @@ bindStyleChipGroup("fashion-style-option", fashionStyleInput);
 bindStyleChipGroup("spirit-style-option", spiritStyleInput);
 renderTaskState({ status: "idle" });
 renderChatMessages();
-hydrateViewerFromQuery();
+void restoreTaskFromNavigation().then((restored) => {
+  if (!restored) {
+    hydrateViewerFromQuery();
+  }
+});
 animate();
 

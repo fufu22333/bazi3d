@@ -132,6 +132,7 @@ class GenerationWorkerTestCase(unittest.TestCase):
         from backend.models import SessionLocal
         from backend.models.generation_task import GenerationTask
         from backend.models.model_asset import ModelAsset
+        from backend.models.work import Work
         from backend.services.generation_worker import run_generation_task
 
         fake_adapter = FakeAdapter()
@@ -149,6 +150,7 @@ class GenerationWorkerTestCase(unittest.TestCase):
             session = SessionLocal()
             stored_task = session.get(GenerationTask, self.task_id)
             assets = session.query(ModelAsset).order_by(ModelAsset.asset_type.asc()).all()
+            works = session.query(Work).order_by(Work.id.asc()).all()
 
         self.assertEqual(task.status, "completed")
         self.assertEqual(stored_task.status, "completed")
@@ -157,6 +159,11 @@ class GenerationWorkerTestCase(unittest.TestCase):
         self.assertEqual(stored_task.character_task_ref, "job-1")
         self.assertEqual(stored_task.spirit_task_ref, "job-2")
         self.assertEqual([asset.asset_type for asset in assets], ["character", "guardian_spirit"])
+        self.assertEqual(len(works), 1)
+        self.assertEqual(works[0].user_id, stored_task.user_id)
+        self.assertEqual(works[0].primary_asset_id, assets[0].id)
+        self.assertEqual(works[0].visibility, "public")
+        self.assertIn("Aster", works[0].title)
         self.assertEqual(len(fake_adapter.submitted_prompts), 2)
 
     def test_character_prompt_front_loads_full_body_constraints(self) -> None:

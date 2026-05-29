@@ -83,6 +83,32 @@ export function createViewerRuntime({
       : guardianUrlInput.value.trim();
   }
 
+  function buildLoaderUrl(url) {
+    if (url.startsWith("./") || url.startsWith("/") || url.startsWith("blob:")) {
+      return url;
+    }
+    return `/api/proxy/glb?url=${encodeURIComponent(url)}`;
+  }
+
+  function fitModelToView(model) {
+    const bounds = new THREE.Box3().setFromObject(model);
+    const size = bounds.getSize(new THREE.Vector3());
+    const center = bounds.getCenter(new THREE.Vector3());
+    const maxAxis = Math.max(size.x, size.y, size.z, 1);
+    const scale = 1.55 / maxAxis;
+
+    model.position.sub(center);
+    model.scale.setScalar(scale);
+
+    const scaledBounds = new THREE.Box3().setFromObject(model);
+    const scaledCenter = scaledBounds.getCenter(new THREE.Vector3());
+    model.position.sub(scaledCenter);
+    model.position.y -= scaledBounds.min.y;
+    controls.target.set(0, 0.85, 0);
+    camera.position.set(0, 1.2, 5.4);
+    controls.update();
+  }
+
   async function loadSelectedModel() {
     const url = getSelectedUrl();
     const label = resourceTypeSelect.value;
@@ -96,9 +122,10 @@ export function createViewerRuntime({
     applySkyboxBackground(scene, textureLoader, skyboxUrlInput.value.trim());
 
     try {
-      const gltf = await loader.loadAsync(url);
+      const gltf = await loader.loadAsync(buildLoaderUrl(url));
       clearCurrentModel();
       currentModel = gltf.scene;
+      fitModelToView(currentModel);
       scene.add(currentModel);
       animationLayer.bind(gltf);
       setStatus(`${formatResourceLabel(label)}模型已加载。`);

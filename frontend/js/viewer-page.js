@@ -55,3 +55,12 @@ personUrlInput.addEventListener("input", hideDemoModelWhenRealUrlExists);
 guardianUrlInput.addEventListener("input", hideDemoModelWhenRealUrlExists);
 
 hideDemoModelWhenRealUrlExists();
+
+function autoLoadModelFromQuery() {
+  if (params.get("autoload") === "1") {
+    hideDemoModelWhenRealUrlExists();
+    void viewerRuntime.loadSelectedModel();
+  }
+}
+
+autoLoadModelFromQuery();

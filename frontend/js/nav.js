@@ -1,5 +1,6 @@
 const TOKEN_STORAGE_KEY = "bazi3d.token";
 const USER_STORAGE_KEY = "bazi3d.user";
+const LAST_TASK_STORAGE_KEY = "bazi3d.lastTaskId";
 
 function getStoredToken() {
   return window.localStorage.getItem("bazi3d.token") || "";
@@ -8,6 +9,21 @@ function getStoredToken() {
 function clearStoredSession() {
   window.localStorage.removeItem("bazi3d.token");
   window.localStorage.removeItem("bazi3d.user");
+}
+
+function resolveLastTaskId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("taskId") || window.localStorage.getItem(LAST_TASK_STORAGE_KEY) || "";
+}
+
+function withTaskContext(href) {
+  const taskId = resolveLastTaskId();
+  if (!taskId || !href.includes("index.html")) {
+    return href;
+  }
+  const url = new URL(href, window.location.href);
+  url.searchParams.set("taskId", taskId);
+  return `${url.pathname.split("/").pop()}${url.search}${url.hash}`;
 }
 
 function resolveCurrentPage(root) {
@@ -34,6 +50,9 @@ function updateCurrentPageState(root) {
   const links = root.querySelectorAll("[data-nav-link]");
 
   links.forEach((link) => {
+    if (link.dataset.navLink === "home") {
+      link.href = withTaskContext(link.getAttribute("href") || "./index.html");
+    }
     const isCurrent = link.dataset.navLink === currentPage;
     link.classList.toggle("is-current", isCurrent);
     if (isCurrent) {

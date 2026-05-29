@@ -1,4 +1,5 @@
 import unittest
+from time import sleep
 
 from sqlalchemy.exc import IntegrityError
 
@@ -66,6 +67,7 @@ class ModelsSmokeTestCase(unittest.TestCase):
         self.session.commit()
 
         original_updated_at = task.updated_at
+        sleep(0.001)
         task.status = "completed"
         self.session.commit()
         self.session.refresh(task)

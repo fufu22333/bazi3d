@@ -13,6 +13,7 @@ from backend.adapters.provider_registry import ProviderRegistry
 from backend.models import SessionLocal
 from backend.models.generation_task import GenerationTask
 from backend.models.model_asset import ModelAsset
+from backend.models.work import Work
 from backend.prompt.llm_client import DeepSeekClient
 from backend.services.guardrails import (
     safe_generate_prompt_output,
@@ -139,21 +140,52 @@ def _persist_assets(
     task: GenerationTask,
     normalized_assets: list[tuple[str, str, dict[str, Any]]],
 ) -> None:
+    primary_character_asset = None
     for asset_type, job_id, normalized in normalized_assets:
-        session.add(
-            ModelAsset(
-                generation_task_id=task.id,
-                asset_type=asset_type,
-                storage_url=normalized["url"],
-                file_format=normalized["format"],
-                asset_metadata=normalized["metadata"],
-            )
+        asset = ModelAsset(
+            generation_task_id=task.id,
+            asset_type=asset_type,
+            storage_url=normalized["url"],
+            file_format=normalized["format"],
+            asset_metadata=normalized["metadata"],
         )
+        session.add(asset)
         if asset_type == "character":
+            primary_character_asset = asset
             task.character_task_ref = job_id
             task.external_task_id = job_id
         if asset_type == "guardian_spirit":
             task.spirit_task_ref = job_id
+
+    session.flush()
+    if primary_character_asset is not None:
+        _publish_generated_work(session, task, primary_character_asset)
+
+
+def _publish_generated_work(
+    session,
+    task: GenerationTask,
+    primary_asset: ModelAsset,
+) -> None:
+    existing_work = (
+        session.query(Work)
+        .filter_by(user_id=task.user_id, primary_asset_id=primary_asset.id)
+        .first()
+    )
+    if existing_work is not None:
+        return
+
+    display_name = task.input_profile.display_name or f"Task {task.id}"
+    session.add(
+        Work(
+            user_id=task.user_id,
+            primary_asset_id=primary_asset.id,
+            title=f"{display_name} 3D形象",
+            description="由规则化输入生成的3D形象作品。",
+            visibility="public",
+            allow_remix=False,
+        )
+    )
 
 
 def _mark_task_failed(session, task_id: int, exc: Exception) -> GenerationTask:
