@@ -79,7 +79,12 @@ def create_task_for_user(user: User, payload: dict) -> GenerationTask:
     finally:
         session.close()
 
-    _start_generation_thread(task.id)
+    should_start_worker = current_app.config.get(
+        "AUTO_START_GENERATION_WORKER",
+        not current_app.config.get("TESTING", False),
+    )
+    if should_start_worker:
+        _start_generation_thread(task.id)
     return task
 
 

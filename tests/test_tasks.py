@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 
 class TaskApiTestCase(unittest.TestCase):
@@ -65,6 +66,30 @@ class TaskApiTestCase(unittest.TestCase):
             fetch_payload["input_profile"]["extra_payload"]["scene_preference"],
             "misty lakeside",
         )
+
+    def test_create_task_does_not_start_background_worker_during_tests(self) -> None:
+        with patch("backend.services.task_service._start_generation_thread") as start_thread:
+            create_response = self.client.post(
+                "/api/tasks",
+                headers={"Authorization": f"Bearer {self.token}"},
+                json={"display_name": "Aster"},
+            )
+
+        self.assertEqual(create_response.status_code, 201)
+        start_thread.assert_not_called()
+
+    def test_create_task_can_explicitly_start_background_worker_in_tests(self) -> None:
+        self.app.config["AUTO_START_GENERATION_WORKER"] = True
+
+        with patch("backend.services.task_service._start_generation_thread") as start_thread:
+            create_response = self.client.post(
+                "/api/tasks",
+                headers={"Authorization": f"Bearer {self.token}"},
+                json={"display_name": "Aster"},
+            )
+
+        self.assertEqual(create_response.status_code, 201)
+        start_thread.assert_called_once_with(create_response.get_json()["id"])
 
 
 if __name__ == "__main__":

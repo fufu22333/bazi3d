@@ -242,7 +242,7 @@ def run_generation_task(task_id: int) -> GenerationTask:
         )
 
         for asset_type in ASSET_PROMPT_FIELDS:
-            prompt = asset_prompts[asset_type]["full_prompt"]
+            prompt = asset_prompts[asset_type]["submitted_prompt"]
             job_id = adapter.submit_job(prompt)
             raw_result = adapter.query_job(job_id)
             normalized = safe_normalize_model_output(

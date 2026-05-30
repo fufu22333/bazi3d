@@ -76,6 +76,11 @@ class FakeAdapter:
         }
 
 
+class FakeTruncatingAdapter(FakeAdapter):
+    def _truncate_prompt(self, prompt: str) -> str:
+        return f"submitted::{prompt[:32]}"
+
+
 class FakeRegistry:
     def __init__(self, adapter) -> None:
         self.adapter = adapter
@@ -227,6 +232,26 @@ class GenerationWorkerTestCase(unittest.TestCase):
             self.assertIn('"prompt_output"', debug_text)
             self.assertIn('"asset_prompts"', debug_text)
             self.assertIn("Create a high-quality stylized 3D character", debug_text)
+
+    def test_successful_run_submits_provider_ready_prompts(self) -> None:
+        from backend.services.generation_worker import run_generation_task
+
+        fake_adapter = FakeTruncatingAdapter()
+
+        with self.app.app_context():
+            with patch(
+                "backend.services.generation_worker._create_llm_client",
+                return_value=FakeLlmClient(),
+            ), patch(
+                "backend.services.generation_worker._build_provider_registry",
+                return_value=FakeRegistry(fake_adapter),
+            ):
+                run_generation_task(self.task_id)
+
+        self.assertEqual(len(fake_adapter.submitted_prompts), 2)
+        self.assertTrue(
+            all(prompt.startswith("submitted::") for prompt in fake_adapter.submitted_prompts)
+        )
 
     def test_failed_run_marks_task_failed_without_assets(self) -> None:
         from backend.models import SessionLocal
