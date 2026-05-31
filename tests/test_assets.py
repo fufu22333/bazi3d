@@ -66,6 +66,64 @@ class AssetApiTestCase(unittest.TestCase):
         self.assertEqual(asset.storage_url, "https://example.com/models/hero.glb")
         self.assertEqual(asset.file_format, "glb")
 
+    def test_serialize_asset_marks_expired_signed_urls_unavailable(self) -> None:
+        from backend.models.model_asset import ModelAsset
+        from backend.services.asset_service import serialize_asset
+
+        asset = ModelAsset(
+            id=9,
+            generation_task_id=1,
+            asset_type="character",
+            storage_url="https://cos.example.com/model.glb?q-sign-time=1;2",
+            file_format="glb",
+            asset_metadata={
+                "thumbnail_url": "https://cos.example.com/preview.png?q-sign-time=1;2",
+            },
+        )
+
+        payload = serialize_asset(asset)
+
+        self.assertFalse(payload["is_available"])
+        self.assertTrue(payload["is_signed_url_expired"])
+        self.assertFalse(payload["metadata"]["thumbnail_available"])
+
+    def test_serialize_asset_marks_local_urls_available(self) -> None:
+        from backend.models.model_asset import ModelAsset
+        from backend.services.asset_service import serialize_asset
+
+        asset = ModelAsset(
+            id=10,
+            generation_task_id=1,
+            asset_type="character",
+            storage_url="/assets/generated/task1-character.glb",
+            file_format="glb",
+            asset_metadata={"thumbnail_url": "/assets/generated/task1-character-preview.png"},
+        )
+
+        payload = serialize_asset(asset)
+
+        self.assertTrue(payload["is_available"])
+        self.assertFalse(payload["is_signed_url_expired"])
+        self.assertTrue(payload["metadata"]["thumbnail_available"])
+
+    def test_serialize_asset_exposes_viewer_resource_type(self) -> None:
+        from backend.models.model_asset import ModelAsset
+        from backend.services.asset_service import serialize_asset
+
+        guardian_asset = ModelAsset(
+            id=11,
+            generation_task_id=1,
+            asset_type="guardian_spirit",
+            storage_url="/assets/generated/task1-guardian.glb",
+            file_format="glb",
+            asset_metadata={},
+        )
+
+        payload = serialize_asset(guardian_asset)
+
+        self.assertEqual(payload["asset_type"], "guardian_spirit")
+        self.assertEqual(payload["type"], "guardian")
+
     def test_get_asset_requires_authentication(self) -> None:
         response = self.client.get("/api/assets/1")
 

@@ -19,6 +19,7 @@ from backend.services.guardrails import (
     safe_generate_prompt_output,
     safe_normalize_model_output,
 )
+from backend.services.asset_cache import cache_generated_asset
 
 
 LOGGER = logging.getLogger(__name__)
@@ -140,8 +141,13 @@ def _persist_assets(
     task: GenerationTask,
     normalized_assets: list[tuple[str, str, dict[str, Any]]],
 ) -> None:
-    primary_character_asset = None
     for asset_type, job_id, normalized in normalized_assets:
+        should_cache_assets = current_app.config.get(
+            "CACHE_GENERATED_ASSETS",
+            not current_app.config.get("TESTING", False),
+        )
+        if should_cache_assets:
+            normalized = cache_generated_asset(task.id, asset_type, normalized)
         asset = ModelAsset(
             generation_task_id=task.id,
             asset_type=asset_type,
@@ -151,15 +157,13 @@ def _persist_assets(
         )
         session.add(asset)
         if asset_type == "character":
-            primary_character_asset = asset
             task.character_task_ref = job_id
             task.external_task_id = job_id
         if asset_type == "guardian_spirit":
             task.spirit_task_ref = job_id
 
-    session.flush()
-    if primary_character_asset is not None:
-        _publish_generated_work(session, task, primary_character_asset)
+        session.flush()
+        _publish_generated_work(session, task, asset)
 
 
 def _publish_generated_work(
@@ -176,12 +180,18 @@ def _publish_generated_work(
         return
 
     display_name = task.input_profile.display_name or f"Task {task.id}"
+    title = f"{display_name} 3D形象"
+    description = "由规则化输入生成的3D形象作品。"
+    if primary_asset.asset_type == "guardian_spirit":
+        title = f"{display_name} 守护灵"
+        description = "由同一生成任务产出的守护灵3D模型作品。"
+
     session.add(
         Work(
             user_id=task.user_id,
             primary_asset_id=primary_asset.id,
-            title=f"{display_name} 3D形象",
-            description="由规则化输入生成的3D形象作品。",
+            title=title,
+            description=description,
             visibility="public",
             allow_remix=False,
         )

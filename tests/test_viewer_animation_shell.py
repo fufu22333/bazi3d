@@ -18,11 +18,16 @@ class ViewerAnimationShellSmokeTestCase(unittest.TestCase):
 
         self.assertIn('id="play-idle"', html)
         self.assertIn('id="play-wave"', html)
+        self.assertIn("摇摆", html)
         self.assertIn('id="motion-status"', html)
 
         self.assertIn("createAnimationLayer", animation_js)
         self.assertIn("hasModel", animation_js)
         self.assertIn("playClip", animation_js)
+        self.assertIn("activePreset", animation_js)
+        self.assertIn("applyFallbackMotion", animation_js)
+        self.assertIn("modelRoot", animation_js)
+        self.assertIn("正在摇摆", animation_js)
 
         self.assertIn("createAnimationLayer", main_js)
         self.assertIn("play-idle", main_js)

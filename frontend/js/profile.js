@@ -13,12 +13,17 @@ function buildWorkDetailUrl(work) {
   return `./work.html?id=${work.id}`;
 }
 
+function getViewerResourceType(work) {
+  return work.asset?.type === "guardian" ? "guardian" : "person";
+}
+
 function buildViewerUrl(work) {
+  const resourceType = getViewerResourceType(work);
   const params = new URLSearchParams({
-    personUrl: work.asset?.url || "",
-    resourceType: "person",
+    resourceType,
     autoload: "1",
   });
+  params.set(resourceType === "guardian" ? "guardianUrl" : "personUrl", work.asset?.url || "");
   return `./viewer.html?${params.toString()}`;
 }
 
@@ -77,11 +82,17 @@ function createWorkRow(work) {
   detailLink.textContent = "查看详情";
   actions.append(detailLink);
 
-  if (work.asset?.url) {
+  if (work.asset?.url && work.asset?.is_available !== false) {
     const viewerLink = document.createElement("a");
     viewerLink.href = buildViewerUrl(work);
     viewerLink.textContent = "打开查看器";
     actions.append(viewerLink);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = work.asset.url;
+    downloadLink.download = `${work.title || "bazi3d-model"}.glb`;
+    downloadLink.textContent = "下载模型";
+    actions.append(downloadLink);
   }
 
   row.append(titleBlock, assetBlock, actions);
@@ -92,7 +103,9 @@ function renderWorks(items) {
   worksListNode.innerHTML = "";
   const safeItems = Array.isArray(items) ? items : [];
   const publicItems = safeItems.filter((work) => work.visibility === "public");
-  const assetItems = safeItems.filter((work) => Boolean(work.asset?.url));
+  const assetItems = safeItems.filter(
+    (work) => Boolean(work.asset?.url) && work.asset?.is_available !== false,
+  );
 
   workCountNode.textContent = String(safeItems.length);
   publicCountNode.textContent = String(publicItems.length);

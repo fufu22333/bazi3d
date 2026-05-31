@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from urllib.parse import parse_qs, urlparse
+
 from backend.models import SessionLocal
 from backend.models.generation_task import GenerationTask
 from backend.models.input_profile import InputProfile
@@ -11,6 +16,29 @@ class AssetNotFoundError(Exception):
 
 class AssetPermissionError(Exception):
     pass
+
+
+def _signed_url_expiry_timestamp(url: str | None) -> int | None:
+    if not url:
+        return None
+    query = parse_qs(urlparse(url).query)
+    sign_time_values = query.get("q-sign-time")
+    if not sign_time_values:
+        return None
+    parts = sign_time_values[0].split(";")
+    if len(parts) != 2:
+        return None
+    try:
+        return int(parts[1])
+    except ValueError:
+        return None
+
+
+def _is_signed_url_expired(url: str | None) -> bool:
+    expiry_timestamp = _signed_url_expiry_timestamp(url)
+    if expiry_timestamp is None:
+        return False
+    return expiry_timestamp <= int(datetime.now(timezone.utc).timestamp())
 
 
 def import_asset_for_user(user: User, payload: dict) -> ModelAsset:
@@ -59,11 +87,22 @@ def import_asset_for_user(user: User, payload: dict) -> ModelAsset:
 
 
 def serialize_asset(asset: ModelAsset) -> dict:
+    metadata = dict(asset.asset_metadata or {})
+    is_signed_url_expired = _is_signed_url_expired(asset.storage_url)
+    thumbnail_url = metadata.get("thumbnail_url")
+    thumbnail_expired = _is_signed_url_expired(thumbnail_url)
+    metadata["thumbnail_available"] = bool(thumbnail_url) and not thumbnail_expired
+    viewer_type = "guardian" if asset.asset_type == "guardian_spirit" else "person"
+
     return {
         "id": asset.id,
+        "asset_type": asset.asset_type,
+        "type": viewer_type,
         "url": asset.storage_url,
         "format": asset.file_format,
-        "metadata": asset.asset_metadata or {},
+        "metadata": metadata,
+        "is_available": bool(asset.storage_url) and not is_signed_url_expired,
+        "is_signed_url_expired": is_signed_url_expired,
     }
 
 

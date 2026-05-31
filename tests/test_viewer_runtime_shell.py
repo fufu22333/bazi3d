@@ -9,10 +9,18 @@ class ViewerRuntimeShellTestCase(unittest.TestCase):
 
         self.assertIn("function buildLoaderUrl", script)
         self.assertIn("/api/proxy/glb?url=", script)
+        self.assertIn('url.startsWith("/")', script)
         self.assertIn("function fitModelToView", script)
         self.assertIn("Box3", script)
         self.assertIn("getSize", script)
         self.assertIn("currentModel", script)
+
+    def test_main_viewer_does_not_proxy_local_generated_assets(self) -> None:
+        script = Path("frontend/js/viewer/main.js").read_text(encoding="utf-8")
+
+        self.assertIn("function buildLoaderUrl", script)
+        self.assertIn('modelSource.url.startsWith("/")', script)
+        self.assertIn("/api/proxy/glb?url=", script)
 
     def test_viewer_page_can_auto_load_query_model(self) -> None:
         page_script = Path("frontend/js/viewer-page.js").read_text(encoding="utf-8")

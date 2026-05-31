@@ -164,12 +164,63 @@ class GenerationWorkerTestCase(unittest.TestCase):
         self.assertEqual(stored_task.character_task_ref, "job-1")
         self.assertEqual(stored_task.spirit_task_ref, "job-2")
         self.assertEqual([asset.asset_type for asset in assets], ["character", "guardian_spirit"])
-        self.assertEqual(len(works), 1)
-        self.assertEqual(works[0].user_id, stored_task.user_id)
-        self.assertEqual(works[0].primary_asset_id, assets[0].id)
-        self.assertEqual(works[0].visibility, "public")
+        self.assertEqual(len(works), 2)
+        self.assertTrue(all(work.user_id == stored_task.user_id for work in works))
+        self.assertEqual(
+            [work.primary_asset_id for work in works],
+            [asset.id for asset in assets],
+        )
+        self.assertTrue(all(work.visibility == "public" for work in works))
         self.assertIn("Aster", works[0].title)
+        self.assertIn("守护灵", works[1].title)
         self.assertEqual(len(fake_adapter.submitted_prompts), 2)
+
+    def test_successful_run_caches_provider_assets_locally(self) -> None:
+        from backend.models import SessionLocal
+        from backend.models.model_asset import ModelAsset
+        from backend.services.generation_worker import run_generation_task
+
+        fake_adapter = FakeAdapter()
+
+        def fake_cache(task_id, asset_type, normalized):
+            return {
+                **normalized,
+                "url": f"/assets/generated/task{task_id}-{asset_type}.glb",
+                "metadata": {
+                    **normalized["metadata"],
+                    "thumbnail_url": f"/assets/generated/task{task_id}-{asset_type}-preview.png",
+                    "source_url": normalized["url"],
+                },
+            }
+
+        with self.app.app_context():
+            self.app.config["CACHE_GENERATED_ASSETS"] = True
+            with patch(
+                "backend.services.generation_worker._create_llm_client",
+                return_value=FakeLlmClient(),
+            ), patch(
+                "backend.services.generation_worker._build_provider_registry",
+                return_value=FakeRegistry(fake_adapter),
+            ), patch(
+                "backend.services.generation_worker.cache_generated_asset",
+                side_effect=fake_cache,
+            ) as cache_mock:
+                run_generation_task(self.task_id)
+
+            session = SessionLocal()
+            assets = session.query(ModelAsset).order_by(ModelAsset.asset_type.asc()).all()
+
+        self.assertEqual(cache_mock.call_count, 2)
+        self.assertEqual(
+            [asset.storage_url for asset in assets],
+            [
+                f"/assets/generated/task{self.task_id}-character.glb",
+                f"/assets/generated/task{self.task_id}-guardian_spirit.glb",
+            ],
+        )
+        self.assertTrue(
+            all(asset.asset_metadata["source_url"].startswith("https://assets.example.com/") for asset in assets)
+        )
 
     def test_character_prompt_front_loads_full_body_constraints(self) -> None:
         from backend.adapters.hunyuan3d_adapter import Hunyuan3DAdapter

@@ -43,6 +43,8 @@ class ProfilePageShellSmokeTestCase(unittest.TestCase):
         self.assertIn("profile-asset-count", script)
         self.assertIn("work-row", script)
         self.assertIn('autoload: "1"', script)
+        self.assertIn("is_available", script)
+        self.assertIn("downloadLink.download", script)
         self.assertIn("work.html?id=", script)
         self.assertNotIn("毕业论文", script)
 

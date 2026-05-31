@@ -35,6 +35,9 @@ const viewerRuntime = createViewerRuntime({
   resourceTypeSelect: document.getElementById("resource-type"),
   skyboxUrlInput: document.getElementById("skybox-url"),
 });
+const personUrlInput = document.getElementById("person-url");
+const guardianUrlInput = document.getElementById("guardian-url");
+const resourceTypeSelect = document.getElementById("resource-type");
 
 function formatVisibility(value) {
   if (value === "public") {
@@ -101,6 +104,17 @@ function toggleManagePanel(work) {
   editAllowRemixInput.checked = Boolean(work.allow_remix);
 }
 
+function getViewerResourceType(work) {
+  return work.asset?.type === "guardian" ? "guardian" : "person";
+}
+
+function syncWorkAssetToViewer(work) {
+  const resourceType = getViewerResourceType(work);
+  resourceTypeSelect.value = resourceType;
+  personUrlInput.value = resourceType === "person" ? work.asset.url : "";
+  guardianUrlInput.value = resourceType === "guardian" ? work.asset.url : "";
+}
+
 function renderWorkDetail(work) {
   currentWork = work;
   titleNode.textContent = work.title;
@@ -112,10 +126,12 @@ function renderWorkDetail(work) {
   renderTags(work.style_tags || []);
   toggleManagePanel(work);
 
-  if (work.asset?.url) {
-    document.getElementById("person-url").value = work.asset.url;
+  if (work.asset?.url && work.asset?.is_available !== false) {
+    syncWorkAssetToViewer(work);
     viewerRuntime.setStatus("只读作品资源已就绪，可直接加载。");
     void viewerRuntime.loadSelectedModel();
+  } else if (work.asset?.is_available === false) {
+    viewerRuntime.setStatusError("该作品的云端临时资源已过期，需要重新生成或重新缓存后才能加载。");
   } else {
     viewerRuntime.setStatus("这件作品没有可加载的资源地址。");
   }

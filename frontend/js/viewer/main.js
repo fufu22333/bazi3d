@@ -339,7 +339,12 @@ function handleUrlInput(resourceType) {
 }
 
 function buildLoaderUrl(modelSource) {
-  if (modelSource.kind === "local-file") {
+  if (
+    modelSource.kind === "local-file" ||
+    modelSource.url.startsWith("./") ||
+    modelSource.url.startsWith("/") ||
+    modelSource.url.startsWith("blob:")
+  ) {
     return modelSource.url;
   }
   return `/api/proxy/glb?url=${encodeURIComponent(modelSource.url)}`;

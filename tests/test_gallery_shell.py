@@ -28,7 +28,12 @@ class GalleryShellSmokeTestCase(unittest.TestCase):
         self.assertIn("renderWorks", script)
         self.assertIn("gallery-grid", script)
         self.assertIn("viewer.html?", script)
+        self.assertIn("getViewerResourceType", script)
+        self.assertIn("guardianUrl", script)
+        self.assertIn("personUrl", script)
         self.assertIn('autoload: "1"', script)
+        self.assertIn("thumbnail_available", script)
+        self.assertIn("downloadLink.download", script)
         self.assertIn("URLSearchParams", viewer_script)
         self.assertNotIn("毕业论文", script)
 
