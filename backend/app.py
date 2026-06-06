@@ -23,15 +23,14 @@ def create_app(test_config: dict | None = None) -> Flask:
     def serve_frontend_file(filename: str):
         return send_from_directory(frontend_dir, filename)
 
-    CORS(
-        app,
-        # resources={r"/api/*": {"origins": "http://127.0.0.1:8000"}},
-        resources={r"/api/*": {"origins": "*"}},
-        supports_credentials=False,
-    )
     app.config.update(get_config())
     if test_config:
         app.config.update(test_config)
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": app.config["CORS_ALLOWED_ORIGINS"]}},
+        supports_credentials=False,
+    )
 
     engine = configure_session(app.config["SQLALCHEMY_DATABASE_URI"])
     if app.config.get("TESTING"):

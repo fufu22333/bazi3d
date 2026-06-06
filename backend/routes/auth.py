@@ -9,6 +9,8 @@ from backend.services.user_service import (
     authenticate_user,
     create_user,
     decode_token,
+    delete_user_account,
+    export_user_data,
     serialize_user,
 )
 
@@ -82,3 +84,16 @@ def login():
 @require_auth
 def me():
     return jsonify({"user": serialize_user(g.current_user)}), 200
+
+
+@auth_bp.get("/export")
+@require_auth
+def export_me():
+    return jsonify(export_user_data(g.current_user)), 200
+
+
+@auth_bp.delete("/me")
+@require_auth
+def delete_me():
+    delete_user_account(g.current_user)
+    return "", 204

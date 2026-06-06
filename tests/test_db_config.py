@@ -37,6 +37,28 @@ class DatabaseConfigTestCase(unittest.TestCase):
             "mysql+pymysql://demo:secret@db.internal:3307/custom_db?charset=utf8mb4",
         )
 
+    def test_production_requires_explicit_jwt_secret(self) -> None:
+        from backend.config import get_config
+
+        with patch.dict(os.environ, {"APP_ENV": "production"}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "JWT_SECRET_KEY"):
+                get_config()
+
+    def test_cors_origins_can_be_configured_from_environment(self) -> None:
+        from backend.config import get_config
+
+        env = {
+            "CORS_ALLOWED_ORIGINS": "https://staging.example.com, https://app.example.com",
+        }
+
+        with patch.dict(os.environ, env, clear=True):
+            config = get_config()
+
+        self.assertEqual(
+            config["CORS_ALLOWED_ORIGINS"],
+            ["https://staging.example.com", "https://app.example.com"],
+        )
+
 
 class DatabaseSessionTestCase(unittest.TestCase):
     def test_configured_scoped_session_can_execute_sql(self) -> None:

@@ -7,7 +7,13 @@ import time
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from backend.models import SessionLocal
+from backend.models.evaluation_log import EvaluationLog
+from backend.models.favorite import Favorite
+from backend.models.generation_task import GenerationTask
+from backend.models.input_profile import InputProfile
+from backend.models.model_asset import ModelAsset
 from backend.models.user import User
+from backend.models.work import Work
 
 
 class DuplicateUserError(Exception):
@@ -37,6 +43,145 @@ def serialize_user(user: User) -> dict:
         "email": user.email,
         "username": user.username,
     }
+
+
+def _serialize_datetime(value) -> str | None:
+    return value.isoformat() if value else None
+
+
+def export_user_data(user: User) -> dict:
+    session = SessionLocal()
+    db_user = session.get(User, user.id)
+    if db_user is None:
+        raise InvalidTokenError("Invalid token user")
+
+    input_profiles = (
+        session.query(InputProfile)
+        .filter_by(user_id=db_user.id)
+        .order_by(InputProfile.id)
+        .all()
+    )
+    tasks = (
+        session.query(GenerationTask)
+        .filter_by(user_id=db_user.id)
+        .order_by(GenerationTask.id)
+        .all()
+    )
+    task_ids = [task.id for task in tasks]
+    assets = (
+        session.query(ModelAsset)
+        .join(GenerationTask)
+        .filter(GenerationTask.user_id == db_user.id)
+        .order_by(ModelAsset.id)
+        .all()
+    )
+    works = session.query(Work).filter_by(user_id=db_user.id).order_by(Work.id).all()
+
+    return {
+        "export_version": "phase3-beta-v1",
+        "user": serialize_user(db_user),
+        "input_profiles": [
+            {
+                "id": profile.id,
+                "display_name": profile.display_name,
+                "gender": profile.gender,
+                "birth_datetime": _serialize_datetime(profile.birth_datetime),
+                "calendar_type": profile.calendar_type,
+                "birth_location": profile.birth_location,
+                "style_profile": profile.style_profile or {},
+                "extra_payload": profile.extra_payload or {},
+                "reference_image_url": profile.reference_image_url,
+                "created_at": _serialize_datetime(profile.created_at),
+            }
+            for profile in input_profiles
+        ],
+        "tasks": [
+            {
+                "id": task.id,
+                "input_profile_id": task.input_profile_id,
+                "status": task.status,
+                "provider": task.provider,
+                "external_task_id": task.external_task_id,
+                "character_task_ref": task.character_task_ref,
+                "spirit_task_ref": task.spirit_task_ref,
+                "error_message": task.error_message,
+                "created_at": _serialize_datetime(task.created_at),
+                "updated_at": _serialize_datetime(task.updated_at),
+            }
+            for task in tasks
+        ],
+        "assets": [
+            {
+                "id": asset.id,
+                "generation_task_id": asset.generation_task_id,
+                "asset_type": asset.asset_type,
+                "url": asset.storage_url,
+                "file_format": asset.file_format,
+                "metadata": asset.asset_metadata or {},
+                "created_at": _serialize_datetime(asset.created_at),
+            }
+            for asset in assets
+        ],
+        "works": [
+            {
+                "id": work.id,
+                "primary_asset_id": work.primary_asset_id,
+                "title": work.title,
+                "description": work.description,
+                "visibility": work.visibility,
+                "allow_remix": work.allow_remix,
+                "created_at": _serialize_datetime(work.created_at),
+            }
+            for work in works
+        ],
+        "task_ids": task_ids,
+    }
+
+
+def delete_user_account(user: User) -> None:
+    session = SessionLocal()
+    db_user = session.get(User, user.id)
+    if db_user is None:
+        raise InvalidTokenError("Invalid token user")
+
+    task_ids = [
+        task_id
+        for (task_id,) in session.query(GenerationTask.id)
+        .filter_by(user_id=db_user.id)
+        .all()
+    ]
+    work_ids = [
+        work_id
+        for (work_id,) in session.query(Work.id).filter_by(user_id=db_user.id).all()
+    ]
+
+    if work_ids:
+        session.query(Favorite).filter(Favorite.work_id.in_(work_ids)).delete(
+            synchronize_session=False
+        )
+        session.query(EvaluationLog).filter(EvaluationLog.work_id.in_(work_ids)).delete(
+            synchronize_session=False
+        )
+    session.query(Favorite).filter_by(user_id=db_user.id).delete(
+        synchronize_session=False
+    )
+    if task_ids:
+        session.query(EvaluationLog).filter(
+            EvaluationLog.generation_task_id.in_(task_ids)
+        ).delete(synchronize_session=False)
+    session.query(Work).filter_by(user_id=db_user.id).delete(synchronize_session=False)
+    if task_ids:
+        session.query(ModelAsset).filter(
+            ModelAsset.generation_task_id.in_(task_ids)
+        ).delete(synchronize_session=False)
+    session.query(GenerationTask).filter_by(user_id=db_user.id).delete(
+        synchronize_session=False
+    )
+    session.query(InputProfile).filter_by(user_id=db_user.id).delete(
+        synchronize_session=False
+    )
+    session.delete(db_user)
+    session.commit()
 
 
 def generate_token(user: User, secret_key: str) -> str:

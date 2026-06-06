@@ -6,6 +6,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _is_production() -> bool:
+    return os.getenv("APP_ENV", os.getenv("FLASK_ENV", "development")).lower() in {
+        "production",
+        "prod",
+    }
+
+
+def _parse_cors_origins(value: str | None) -> list[str] | str:
+    if not value:
+        return []
+    origins = [origin.strip() for origin in value.split(",") if origin.strip()]
+    if origins == ["*"]:
+        return "*"
+    return origins
+
+
 def build_database_uri() -> str:
     database_uri = os.getenv("SQLALCHEMY_DATABASE_URI")
     if database_uri:
@@ -21,9 +37,27 @@ def build_database_uri() -> str:
 
 
 def get_config() -> dict:
+    jwt_secret_key = os.getenv("JWT_SECRET_KEY")
+    if _is_production() and not jwt_secret_key:
+        raise RuntimeError("JWT_SECRET_KEY is required when APP_ENV is production")
+
+    cors_allowed_origins = _parse_cors_origins(os.getenv("CORS_ALLOWED_ORIGINS"))
+    if _is_production() and cors_allowed_origins in ("*", []):
+        raise RuntimeError(
+            "CORS_ALLOWED_ORIGINS must list explicit origins in production"
+        )
+
     return {
         "SQLALCHEMY_DATABASE_URI": build_database_uri(),
-        "JWT_SECRET_KEY": os.getenv("JWT_SECRET_KEY", "dev-secret-key"),
+        "JWT_SECRET_KEY": jwt_secret_key or "dev-secret-key",
+        "CORS_ALLOWED_ORIGINS": cors_allowed_origins or "*",
+        "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO"),
+        "ASSET_STORAGE_BUCKET": os.getenv("ASSET_STORAGE_BUCKET", ""),
+        "ASSET_STORAGE_REGION": os.getenv("ASSET_STORAGE_REGION", ""),
+        "ASSET_STORAGE_PUBLIC_BASE_URL": os.getenv(
+            "ASSET_STORAGE_PUBLIC_BASE_URL", ""
+        ),
+        "SENTRY_DSN": os.getenv("SENTRY_DSN", ""),
         "MESHY_API_KEY": os.getenv("MESHY_API_KEY", ""),
         "MESHY_BASE_URL": os.getenv("MESHY_BASE_URL", "https://api.meshy.ai"),
         "TENCENTCLOUD_SECRET_ID": os.getenv(

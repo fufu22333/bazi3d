@@ -60,6 +60,7 @@ Then update `.env` with your own local values, for example:
 
 - `SQLALCHEMY_DATABASE_URI` or MySQL connection fields
 - `JWT_SECRET_KEY`
+- `CORS_ALLOWED_ORIGINS`
 - optional provider keys such as `DEEPSEEK_API_KEY`, `MESHY_API_KEY`, `TENCENTCLOUD_SECRET_ID`, `TENCENTCLOUD_SECRET_KEY`
 
 ### 3. Initialize the database
@@ -82,9 +83,10 @@ Default local entry points:
 ## Known Issues / Notes
 
 - This repository is currently in development and may contain incomplete flows or placeholder behavior.
-- `backend/config.py` includes development-oriented fallback values such as `MYSQL_PASSWORD=123456` and `JWT_SECRET_KEY=dev-secret-key`. These are for local development only and must not be used in production.
-- CORS is currently configured as `*` for `/api/*`, which is convenient for development but too permissive for production deployment.
+- `backend/config.py` includes development-oriented fallback values such as `JWT_SECRET_KEY=dev-secret-key`. These are for local development only. When `APP_ENV=production`, production deployment must provide an explicit `JWT_SECRET_KEY`.
+- CORS defaults to `*` for local development. When `APP_ENV=production`, deployment must provide explicit `CORS_ALLOWED_ORIGINS`.
 - Frontend auth tokens are currently stored in `localStorage`, which is acceptable for prototyping but not ideal for stronger security requirements.
+- Phase 3 release runbooks, legal readiness, beta operations, export, and deletion notes live in `docs/product/`.
 - `.env`, local virtual environments, IDE metadata, caches, generated screenshots, private documents, and local output artifacts should remain untracked in public pushes.
 
 ## Roadmap
