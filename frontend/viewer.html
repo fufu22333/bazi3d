@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D模型查看器</title>
+    <title>礼物模型查看器</title>
     <style>
       :root {
         color-scheme: light;
@@ -172,8 +172,8 @@
     <main id="screenshot-viewer-page">
       <div class="topbar">
         <div>
-          <p class="eyebrow">3D模型查看器</p>
-          <h1>模型资源加载与交互展示</h1>
+          <p class="eyebrow">礼物模型查看器</p>
+          <h1>预览生日纪念模型与守护摆件</h1>
         </div>
         <nav class="site-nav" data-nav-root data-nav-page="home" aria-label="主导航">
           <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
@@ -185,8 +185,8 @@
 
       <div class="layout">
         <section class="panel">
-          <h2>Web 3D展示区域</h2>
-          <p class="muted">查看器负责加载人物或守护灵 GLB 资源，并提供模型切换、动作状态和悬停交互状态。</p>
+          <h2>Web 3D 预览区域</h2>
+          <p class="muted">查看器负责加载礼物主模型或守护摆件 GLB 资源，并提供模型切换、动作状态和悬停交互状态。</p>
           <div class="viewer-shell">
             <canvas id="viewer-canvas"></canvas>
             <img
@@ -199,25 +199,25 @@
           </div>
           <div class="viewer-toolbar">
             <select id="resource-type">
-              <option value="person">人物模型</option>
-              <option value="guardian">守护灵模型</option>
+              <option value="person">礼物模型</option>
+              <option value="guardian">守护摆件</option>
             </select>
-            <input id="person-url" type="url" placeholder="人物 GLB 地址" />
-            <input id="guardian-url" type="url" placeholder="守护灵 GLB 地址" />
+            <input id="person-url" type="url" placeholder="礼物模型 GLB 地址" />
+            <input id="guardian-url" type="url" placeholder="守护摆件 GLB 地址" />
             <input id="skybox-url" type="url" placeholder="天空盒 URL（可选）" />
-            <button class="primary" id="load-model" type="button">加载模型</button>
+            <button class="primary" id="load-model" type="button">预览 GLB</button>
           </div>
         </section>
 
         <aside class="panel side-stack">
           <div>
             <h2>查看器状态</h2>
-            <p class="muted">查看器显示当前生成资源，可切换人物或守护灵模型并观察交互状态。</p>
+            <p class="muted">查看器显示当前生成资源，可切换礼物主模型或守护摆件并观察交互状态。</p>
           </div>
           <div class="status-grid">
             <div class="status-card">
               <h3>资源状态</h3>
-              <p id="viewer-status" class="muted">演示模型已显示，可输入 GLB 地址加载真实资源。</p>
+              <p id="viewer-status" class="muted">演示模型已显示，可输入 GLB 地址加载真实礼物资源。</p>
             </div>
             <div class="status-card">
               <h3>动作状态</h3>

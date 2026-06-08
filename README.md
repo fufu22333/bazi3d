@@ -2,6 +2,8 @@
 
 Bazi3D is an experimental full-stack web project that explores turning structured user input into stylized 3D character content. The project is currently in demo / development stage, with a Flask backend, a static multi-page frontend, and a growing set of automated tests.
 
+The current product repositioning is moving the demo toward a more concrete use case: generating a personalized, 3D-previewable birthday gift model from birth context, relationship, style preferences, and gift intent. See `docs/product/birthday-gift-model-refactor-plan.md` for the lightweight refactor plan.
+
 ## Project Overview
 
 The current version focuses on a V1 exploration workflow:
@@ -91,6 +93,7 @@ Default local entry points:
 
 ## Roadmap
 
+- Reframe the V1 experience around personalized birthday gift model customization.
 - Continue improving frontend page consistency and navigation flow
 - Strengthen the end-to-end generation pipeline from user input to result display
 - Improve environment separation and deployment readiness

@@ -51,19 +51,31 @@ def _build_asset_prompt(asset_key: str, section, input_profile: dict[str, Any]) 
     gender = input_profile.get("gender") or "unspecified"
     birth_location = input_profile.get("birth_location") or "unknown"
     birth_datetime = input_profile.get("birth_datetime") or "unknown"
+    extra_payload = input_profile.get("extra_payload") or {}
+    occasion = extra_payload.get("occasion") or "birthday"
+    relationship = extra_payload.get("relationship") or "unspecified"
+    gift_message = extra_payload.get("gift_message") or ""
+    favorite_color = extra_payload.get("favorite_color") or ""
     pose_keywords = ", ".join(section.pose_keywords)
     visual_keywords = ", ".join(section.visual_keywords)
 
-    role_label = "3D character" if asset_key == "character" else "guardian spirit"
+    role_label = (
+        "personalized 3D keepsake gift figure"
+        if asset_key == "character"
+        else "symbolic guardian ornament"
+    )
     geometry_constraints = (
         "Mandatory geometry constraints: complete full-body human figure from head to feet; "
         "visible full legs, feet and footwear; standing full-body composition; "
-        "not a bust; not a half-body; not a portrait; not cropped at waist or knees."
+        "stable standing pose; readable large forms; clean GLB-ready geometry; "
+        "avoid ultra-thin floating details; not a bust; not a half-body; "
+        "not a portrait; not cropped at waist or knees."
         if asset_key == "character"
         else (
             "Mandatory geometry constraints: complete full-body non-human companion creature; "
-            "visible head, torso, limbs or paws, and tail if present; not a bust; "
-            "not a half-body; not a portrait; not cropped."
+            "visible head, torso, limbs or paws, and tail if present; compact stable display pose; "
+            "readable large forms; clean GLB-ready geometry; avoid ultra-thin floating details; "
+            "not a bust; not a half-body; not a portrait; not cropped."
         )
     )
     return (
@@ -73,12 +85,17 @@ def _build_asset_prompt(asset_key: str, section, input_profile: dict[str, Any]) 
         f"Gender presentation: {gender}\n"
         f"Birth location: {birth_location}\n"
         f"Birth datetime: {birth_datetime}\n"
+        f"Gift occasion: {occasion}\n"
+        f"Relationship to gift giver: {relationship}\n"
+        f"Gift message: {gift_message}\n"
+        f"Favorite color: {favorite_color}\n"
         f"Style: {section.style}\n"
         f"Material: {section.material}\n"
         f"Pose keywords: {pose_keywords}\n"
         f"Visual keywords: {visual_keywords}\n"
         f"Description: {section.description}\n"
-        "Output should emphasize complete character silhouette, readable forms, and clean 3D details."
+        "Output should emphasize complete silhouette, readable forms, stable physical display, "
+        "and clean 3D details suitable for GLB preview and future print-aware review."
     )
 
 
@@ -180,11 +197,24 @@ def _publish_generated_work(
         return
 
     display_name = task.input_profile.display_name or f"Task {task.id}"
-    title = f"{display_name} 3D形象"
-    description = "由规则化输入生成的3D形象作品。"
+    extra_payload = task.input_profile.extra_payload or {}
+    occasion = extra_payload.get("occasion") or "birthday"
+    gift_message = extra_payload.get("gift_message") or ""
+    occasion_label = "生日" if occasion == "birthday" else "纪念"
+
+    title = f"{display_name} 的{occasion_label}纪念模型"
+    description = (
+        f"为{display_name}生成的{occasion_label}礼物主模型，可在 Web 查看器中预览并下载 GLB。"
+    )
+    if gift_message:
+        description = f"{description} 礼物祝福：{gift_message}"
     if primary_asset.asset_type == "guardian_spirit":
-        title = f"{display_name} 守护灵"
-        description = "由同一生成任务产出的守护灵3D模型作品。"
+        title = f"{display_name} 的守护摆件"
+        description = (
+            f"与{occasion_label}礼物主模型配套的象征陪伴摆件，可作为 GLB 预览和下载资源。"
+        )
+        if gift_message:
+            description = f"{description} 礼物祝福：{gift_message}"
 
     session.add(
         Work(

@@ -6,22 +6,26 @@ class ScreenshotPagesShellTestCase(unittest.TestCase):
     def test_separated_screenshot_pages_exist_with_distinct_hooks(self) -> None:
         pages = {
             "create.html": (
-                "id=\"screenshot-create-page\"",
-                "id=\"rule-input-form\"",
+                'id="screenshot-create-page"',
+                'id="rule-input-form"',
                 "./js/create-page.js",
-                "规则化输入采集",
+                "生日礼物模型定制",
+                'id="occasion"',
+                'id="relationship"',
+                'id="gift-message"',
+                'id="favorite-color"',
             ),
             "task.html": (
-                "id=\"screenshot-task-page\"",
-                "id=\"task-timeline\"",
+                'id="screenshot-task-page"',
+                'id="task-timeline"',
                 "./js/task-page.js",
-                "生成任务跟踪",
+                "生成任务",
             ),
             "viewer.html": (
-                "id=\"screenshot-viewer-page\"",
-                "id=\"viewer-canvas\"",
+                'id="screenshot-viewer-page"',
+                'id="viewer-canvas"',
                 "./js/viewer-page.js",
-                "3D模型查看器",
+                "3D",
             ),
         }
 
@@ -41,6 +45,10 @@ class ScreenshotPagesShellTestCase(unittest.TestCase):
         viewer_script = Path("frontend/js/viewer-page.js").read_text(encoding="utf-8")
 
         self.assertIn("createTask", create_script)
+        self.assertIn("occasion:", create_script)
+        self.assertIn("relationship:", create_script)
+        self.assertIn("gift_message:", create_script)
+        self.assertIn("favorite_color:", create_script)
         self.assertIn("fetchTask", task_script)
         self.assertIn("createViewerRuntime", viewer_script)
         self.assertIn("taskId", task_script)

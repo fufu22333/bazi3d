@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>作品详情</title>
+    <title>礼物模型详情</title>
     <style>
       :root {
         --page-bg: #f4f6fb;
@@ -215,8 +215,8 @@
     <main>
       <div class="topbar">
         <div>
-          <p class="eyebrow">作品详情</p>
-          <h1 id="work-title">正在加载作品...</h1>
+          <p class="eyebrow">礼物模型详情</p>
+          <h1 id="work-title">正在加载礼物模型...</h1>
         </div>
         <nav class="site-nav" data-nav-root data-nav-page="work" aria-label="主导航">
           <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
@@ -230,7 +230,7 @@
       <div id="work-layout">
         <section class="panel">
           <div class="panel-header">
-            <h2>查看器</h2>
+            <h2>礼物预览</h2>
             <p id="work-viewer-status">正在准备查看器...</p>
           </div>
           <div class="viewer-shell">
@@ -245,27 +245,27 @@
           </div>
           <div class="viewer-toolbar">
             <label>
-              人物 GLB 地址
+              礼物模型 GLB 地址
               <input id="person-url" type="url" />
             </label>
             <label>
-              守护灵 GLB 地址
+              守护摆件 GLB 地址
               <input id="guardian-url" type="url" />
             </label>
           </div>
           <div class="viewer-toolbar">
             <label>
-              当前模型
+              当前资源
               <select id="resource-type">
-                <option value="person">人物</option>
-                <option value="guardian">守护灵</option>
+                <option value="person">礼物模型</option>
+                <option value="guardian">守护摆件</option>
               </select>
             </label>
             <label>
               天空盒 URL（可选）
               <input id="skybox-url" type="url" />
             </label>
-            <button id="load-model" type="button">加载模型</button>
+            <button id="load-model" type="button">预览 GLB</button>
             <button id="play-idle" type="button">待机</button>
             <button id="play-wave" type="button">摇摆</button>
           </div>
@@ -277,7 +277,7 @@
 
         <section class="panel meta-list">
           <div class="panel-header">
-            <h2>作品信息</h2>
+            <h2>礼物信息</h2>
             <p id="work-status">正在加载只读详情...</p>
           </div>
           <div class="meta-block">

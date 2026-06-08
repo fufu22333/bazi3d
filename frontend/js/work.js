@@ -50,7 +50,7 @@ function formatVisibility(value) {
 }
 
 function formatResourceLabel(value) {
-  return value === "guardian" ? "守护灵" : "人物";
+  return value === "guardian" ? "守护摆件" : "礼物模型";
 }
 
 function getWorkIdFromLocation() {
@@ -118,34 +118,34 @@ function syncWorkAssetToViewer(work) {
 function renderWorkDetail(work) {
   currentWork = work;
   titleNode.textContent = work.title;
-  descriptionNode.textContent = work.description || "暂无描述。";
+  descriptionNode.textContent = work.description || "暂无礼物模型描述。";
   authorNode.textContent = work.author?.username || "未知";
   visibilityNode.textContent = formatVisibility(work.visibility);
   createdAtNode.textContent = work.created_at || "未知";
-  statusNode.textContent = "作品详情已加载。";
+  statusNode.textContent = "礼物模型详情已加载。";
   renderTags(work.style_tags || []);
   toggleManagePanel(work);
 
   if (work.asset?.url && work.asset?.is_available !== false) {
     syncWorkAssetToViewer(work);
-    viewerRuntime.setStatus("只读作品资源已就绪，可直接加载。");
+    viewerRuntime.setStatus("礼物模型资源已就绪，可直接预览。");
     void viewerRuntime.loadSelectedModel();
   } else if (work.asset?.is_available === false) {
-    viewerRuntime.setStatusError("该作品的云端临时资源已过期，需要重新生成或重新缓存后才能加载。");
+    viewerRuntime.setStatusError("该礼物模型的云端临时资源已过期，需要重新生成或重新缓存后才能加载。");
   } else {
-    viewerRuntime.setStatus("这件作品没有可加载的资源地址。");
+    viewerRuntime.setStatus("这件礼物模型没有可加载的资源地址。");
   }
 }
 
 function renderDemoWorkDetail() {
   renderWorkDetail({
     id: 13,
-    title: "实现素材演示作品",
-    description: "基于规则化输入生成的人物模型资源，支持在 Web 查看器中查看模型效果。",
+    title: "Ling Yuan 的生日纪念模型",
+    description: "基于生日、关系和祝福意图生成的礼物主模型，支持在 Web 查看器中预览并下载 GLB。",
     visibility: "public",
     created_at: "2026-05-28 15:30",
     allow_remix: false,
-    style_tags: ["现代休闲", "水光梦境", "Web 3D"],
+    style_tags: ["生日礼物", "优雅收藏", "Web 3D"],
     author: {
       id: 1,
       username: "impl_user",
@@ -153,7 +153,7 @@ function renderDemoWorkDetail() {
     asset: null,
   });
   demoModelNode.classList.remove("is-hidden");
-  viewerRuntime.setStatus("演示作品资源已显示，可在右侧查看作品信息。");
+  viewerRuntime.setStatus("演示礼物模型已显示，可在右侧查看礼物信息。");
   managePanelNode.classList.add("is-hidden");
 }
 
@@ -202,20 +202,20 @@ export async function loadWorkDetail() {
 
   const workId = getWorkIdFromLocation();
   if (!workId) {
-    statusNode.textContent = "缺少作品 ID。";
-    titleNode.textContent = "未找到作品";
+    statusNode.textContent = "缺少礼物模型 ID。";
+    titleNode.textContent = "未找到礼物模型";
     return;
   }
 
-  statusNode.textContent = `正在加载作品 #${workId}...`;
+  statusNode.textContent = `正在加载礼物模型 #${workId}...`;
 
   try {
     const work = await fetchWorkDetail(workId);
     renderWorkDetail(work);
   } catch (error) {
-    statusNode.textContent = error.message || "加载作品详情失败。";
-    titleNode.textContent = "未找到作品";
-    viewerRuntime.setStatusError("无法加载该作品的资源。");
+    statusNode.textContent = error.message || "加载礼物模型详情失败。";
+    titleNode.textContent = "未找到礼物模型";
+    viewerRuntime.setStatusError("无法加载该礼物模型的资源。");
   }
 }
 

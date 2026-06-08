@@ -63,15 +63,17 @@ function createWorkCard(work) {
   const preview = createPreview(work);
 
   const title = document.createElement("h2");
-  title.textContent = work.title || "未命名作品";
+  title.textContent = work.title || "未命名礼物模型";
 
   const description = document.createElement("p");
   description.className = "muted";
-  description.textContent = work.description || "暂无作品描述。";
+  description.textContent = work.description || "暂无礼物模型描述。";
 
   const meta = document.createElement("div");
   meta.className = "work-meta";
-  meta.textContent = `可见性：${formatVisibility(work.visibility)}`;
+  const occasion = work.asset?.metadata?.occasion || work.extra_payload?.occasion || "birthday";
+  const occasionLabel = occasion === "birthday" ? "生日礼物" : "纪念礼物";
+  meta.textContent = `${occasionLabel} · 可见性：${formatVisibility(work.visibility)}`;
 
   const actions = document.createElement("div");
   actions.className = "work-actions";
@@ -79,19 +81,19 @@ function createWorkCard(work) {
   if (work.asset?.is_available !== false && work.asset?.url) {
     const viewerLink = document.createElement("a");
     viewerLink.href = buildViewerUrl(work);
-    viewerLink.textContent = "打开查看器";
+    viewerLink.textContent = "预览礼物模型";
     actions.append(viewerLink);
 
     const downloadLink = document.createElement("a");
     downloadLink.href = work.asset.url;
     downloadLink.download = `${work.title || "bazi3d-model"}.glb`;
-    downloadLink.textContent = "下载模型";
+    downloadLink.textContent = "下载 GLB";
     actions.append(downloadLink);
   }
 
   const detailLink = document.createElement("a");
   detailLink.href = buildWorkDetailUrl(work);
-  detailLink.textContent = "查看详情";
+  detailLink.textContent = "查看礼物详情";
 
   actions.append(detailLink);
   card.append(preview, title, description, meta, actions);
@@ -103,11 +105,11 @@ export function renderWorks(items) {
   listNode.classList.add("gallery-grid");
 
   if (!Array.isArray(items) || items.length === 0) {
-    statusNode.textContent = "暂无公开作品。";
+    statusNode.textContent = "暂无公开礼物模型。";
     return;
   }
 
-  statusNode.textContent = `已加载 ${items.length} 个公开作品。`;
+  statusNode.textContent = `已加载 ${items.length} 个公开礼物模型。`;
 
   items.forEach((work) => {
     listNode.append(createWorkCard(work));
@@ -119,7 +121,7 @@ async function loadGallery() {
     const payload = await fetchWorks();
     renderWorks(payload.items);
   } catch (error) {
-    statusNode.textContent = "加载公开作品失败。";
+    statusNode.textContent = "加载公开礼物模型失败。";
     console.error(error);
   }
 }

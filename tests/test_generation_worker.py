@@ -119,6 +119,12 @@ class GenerationWorkerTestCase(unittest.TestCase):
                 user_id=user.id,
                 display_name="Aster",
                 birth_datetime=datetime(2024, 1, 2, 3, 4, 5),
+                extra_payload={
+                    "occasion": "birthday",
+                    "relationship": "friend",
+                    "gift_message": "May every new year feel bright.",
+                    "favorite_color": "teal",
+                },
             )
             session.add(profile)
             session.commit()
@@ -171,8 +177,11 @@ class GenerationWorkerTestCase(unittest.TestCase):
             [asset.id for asset in assets],
         )
         self.assertTrue(all(work.visibility == "public" for work in works))
-        self.assertIn("Aster", works[0].title)
-        self.assertIn("守护灵", works[1].title)
+        self.assertEqual(works[0].title, "Aster 的生日纪念模型")
+        self.assertEqual(works[1].title, "Aster 的守护摆件")
+        self.assertIn("生日礼物", works[0].description)
+        self.assertIn("GLB", works[0].description)
+        self.assertIn("May every new year feel bright.", works[0].description)
         self.assertEqual(len(fake_adapter.submitted_prompts), 2)
 
     def test_successful_run_caches_provider_assets_locally(self) -> None:
@@ -282,7 +291,10 @@ class GenerationWorkerTestCase(unittest.TestCase):
             debug_text = debug_path.read_text(encoding="utf-8")
             self.assertIn('"prompt_output"', debug_text)
             self.assertIn('"asset_prompts"', debug_text)
-            self.assertIn("Create a high-quality stylized 3D character", debug_text)
+            self.assertIn(
+                "Create a high-quality stylized personalized 3D keepsake gift figure",
+                debug_text,
+            )
 
     def test_successful_run_submits_provider_ready_prompts(self) -> None:
         from backend.services.generation_worker import run_generation_task

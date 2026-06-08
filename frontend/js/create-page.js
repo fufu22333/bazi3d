@@ -3,29 +3,43 @@ import { handleUnauthorized } from "./modules/auth-guard.js";
 
 const form = document.getElementById("rule-input-form");
 const displayNameInput = document.getElementById("display-name");
+const occasionInput = document.getElementById("occasion");
+const relationshipInput = document.getElementById("relationship");
 const genderInput = document.getElementById("gender");
 const birthLocationInput = document.getElementById("birth-location");
 const birthDateTimeInput = document.getElementById("birth-datetime");
+const favoriteColorInput = document.getElementById("favorite-color");
 const referenceImageUrlInput = document.getElementById("reference-image-url");
+const giftMessageInput = document.getElementById("gift-message");
 const fashionStyleInput = document.getElementById("fashion-style");
 const spiritStyleInput = document.getElementById("spirit-style");
+const extraNoteInput = document.getElementById("extra-note");
 const profileSummaryNode = document.getElementById("profile-summary");
 const styleSummaryNode = document.getElementById("style-summary");
 const submitStatusNode = document.getElementById("submit-status");
 
 const demoValues = {
-  displayName: "Ling Yuan RealChain",
+  displayName: "Ling Yuan",
+  occasion: "birthday",
+  relationship: "friend",
   gender: "female",
   birthLocation: "Shanghai",
   birthDateTime: "1995-06-15T09:30",
+  favoriteColor: "teal",
   referenceImageUrl: "https://example.com/reference.png",
-  fashionStyle: "modern_casual, clean silhouette, teal jacket, white sneakers",
-  spiritStyle: "eastern_classical, water light aura, balanced guardian motif",
+  giftMessage: "愿你在新的一岁里保持明亮、笃定和自由。",
+  fashionStyle: "elegant_collectible, clean silhouette, teal accent, stable standing pose",
+  spiritStyle: "eastern_classical, water light aura, compact guardian ornament",
+  extraNote: "温柔、观察力强、喜欢清爽层次。模型需要轮廓完整、结构稳定、适合 GLB 预览。",
 };
 
+function selectedText(selectNode) {
+  return selectNode.options[selectNode.selectedIndex]?.text || "";
+}
+
 function renderSummary() {
-  profileSummaryNode.textContent = `${displayNameInput.value || "未命名"}，${genderInput.options[genderInput.selectedIndex]?.text || "不限定"}，出生地点 ${birthLocationInput.value || "未填写"}。`;
-  styleSummaryNode.textContent = `外在风格：${fashionStyleInput.value || "未填写"}；内在气质：${spiritStyleInput.value || "未填写"}。`;
+  profileSummaryNode.textContent = `${displayNameInput.value || "未命名"}，${selectedText(relationshipInput) || "未填写"}，${selectedText(occasionInput) || "生日"}，出生城市 ${birthLocationInput.value || "未填写"}。`;
+  styleSummaryNode.textContent = `主模型：${fashionStyleInput.value || "未填写"}；陪伴摆件：${spiritStyleInput.value || "未填写"}；偏好色：${favoriteColorInput.value || "未填写"}。`;
 }
 
 function bindStyleChipGroup(groupName, targetInput) {
@@ -49,20 +63,30 @@ function buildTaskPayload() {
     },
     extra_payload: {
       birth_datetime: birthDateTimeInput.value || null,
+      occasion: occasionInput.value.trim() || "birthday",
+      relationship: relationshipInput.value.trim(),
+      gift_message: giftMessageInput.value.trim(),
+      favorite_color: favoriteColorInput.value.trim(),
+      free_text: extraNoteInput.value.trim(),
     },
   };
 }
 
 function applyDemoValues() {
   displayNameInput.value = demoValues.displayName;
+  occasionInput.value = demoValues.occasion;
+  relationshipInput.value = demoValues.relationship;
   genderInput.value = demoValues.gender;
   birthLocationInput.value = demoValues.birthLocation;
   birthDateTimeInput.value = demoValues.birthDateTime;
+  favoriteColorInput.value = demoValues.favoriteColor;
   referenceImageUrlInput.value = demoValues.referenceImageUrl;
+  giftMessageInput.value = demoValues.giftMessage;
   fashionStyleInput.value = demoValues.fashionStyle;
   spiritStyleInput.value = demoValues.spiritStyle;
+  extraNoteInput.value = demoValues.extraNote;
   renderSummary();
-  submitStatusNode.textContent = "演示数据已恢复，可继续提交生成任务。";
+  submitStatusNode.textContent = "演示数据已恢复，可继续生成生日礼物模型。";
 }
 
 async function handleSubmit(event) {
@@ -73,7 +97,7 @@ async function handleSubmit(event) {
     return;
   }
 
-  submitStatusNode.textContent = "正在创建生成任务...";
+  submitStatusNode.textContent = "正在创建生日礼物模型任务...";
   try {
     const task = await createTask(token, buildTaskPayload());
     window.localStorage.setItem("bazi3d.lastTaskId", String(task.id));
@@ -86,12 +110,17 @@ async function handleSubmit(event) {
 
 [
   displayNameInput,
+  occasionInput,
+  relationshipInput,
   genderInput,
   birthLocationInput,
   birthDateTimeInput,
+  favoriteColorInput,
   referenceImageUrlInput,
+  giftMessageInput,
   fashionStyleInput,
   spiritStyleInput,
+  extraNoteInput,
 ].forEach((node) => {
   node.addEventListener("input", renderSummary);
   node.addEventListener("change", renderSummary);

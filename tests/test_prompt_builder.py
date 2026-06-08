@@ -18,6 +18,10 @@ class PromptBuilderTestCase(unittest.TestCase):
                 "personality_tags": ["calm", "observant"],
                 "scene_preference": "misty lakeside",
                 "free_text": "soft silhouette with layered accessories",
+                "occasion": "birthday",
+                "relationship": "friend",
+                "gift_message": "May this gift bring courage and calm.",
+                "favorite_color": "teal",
             },
         }
 
@@ -30,7 +34,21 @@ class PromptBuilderTestCase(unittest.TestCase):
         self.assertIn("modern casual", prompt)
         self.assertIn("dreamy water", prompt)
         self.assertIn("https://example.com/reference.png", prompt)
+        self.assertIn("birthday", prompt)
+        self.assertIn("friend", prompt)
+        self.assertIn("May this gift bring courage and calm.", prompt)
+        self.assertIn("teal", prompt)
         self.assertIn('"version"', prompt)
+
+    def test_build_prompt_reframes_assets_as_print_aware_gift_models(self) -> None:
+        from backend.prompt.builder import build_prompt
+
+        prompt = build_prompt(self.input_profile)
+
+        self.assertIn("personalized 3D keepsake figure", prompt)
+        self.assertIn("symbolic guardian ornament", prompt)
+        self.assertIn("stable standing pose", prompt)
+        self.assertIn("avoid ultra-thin floating details", prompt)
 
     def test_build_prompt_contains_character_design_constraints(self) -> None:
         from backend.prompt.builder import build_prompt
@@ -38,7 +56,7 @@ class PromptBuilderTestCase(unittest.TestCase):
         prompt = build_prompt(self.input_profile)
 
         self.assertIn(
-            "You are an AI costume designer combining Chinese Bazi astrology with modern 3D character design.",
+            "You are an AI gift figure designer combining symbolic birth context with modern 3D character design.",
             prompt,
         )
         self.assertIn(
@@ -58,11 +76,11 @@ class PromptBuilderTestCase(unittest.TestCase):
         prompt = build_prompt(self.input_profile)
 
         self.assertIn(
-            "You are an AI guardian spirit designer combining personality analysis with 3D character design.",
+            "You are an AI symbolic guardian ornament designer combining personality analysis with 3D gift design.",
             prompt,
         )
         self.assertIn(
-            "Design a guardian spirit companion that visually complements the character's outfit in color palette and material tone.",
+            "Design a symbolic guardian ornament that visually complements the keepsake figure in color palette, material tone, and gift meaning.",
             prompt,
         )
         self.assertIn(
