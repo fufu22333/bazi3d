@@ -13,6 +13,17 @@ class HealthCheckTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), {"status": "ok"})
 
+    def test_health_endpoint_includes_request_id_header(self) -> None:
+        from backend.app import create_app
+
+        app = create_app({"SQLALCHEMY_DATABASE_URI": "sqlite+pysqlite:///:memory:"})
+        client = app.test_client()
+
+        response = client.get("/health", headers={"X-Request-Id": "phase3-req"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-Request-Id"], "phase3-req")
+
 
 if __name__ == "__main__":
     unittest.main()

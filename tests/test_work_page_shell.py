@@ -35,9 +35,9 @@ class WorkPageShellSmokeTestCase(unittest.TestCase):
         self.assertIn('id="save-work"', html)
         self.assertIn('id="delete-work"', html)
         self.assertIn('id="viewer-canvas"', html)
-        self.assertIn("作品详情", html)
+        self.assertIn("礼物模型详情", html)
         self.assertIn("返回画廊", html)
-        self.assertIn("作品信息", html)
+        self.assertIn("礼物信息", html)
 
         self.assertIn("fetchWorkDetail", api_script)
         self.assertIn("updateWorkDetail", api_script)
@@ -53,8 +53,8 @@ class WorkPageShellSmokeTestCase(unittest.TestCase):
         self.assertIn("toggleManagePanel", script)
         self.assertIn("handleSaveSubmit", script)
         self.assertIn("handleDeleteClick", script)
-        self.assertIn("保存作品修改", script)
-        self.assertIn("未找到作品", script)
+        self.assertIn("正在保存作品修改", script)
+        self.assertIn("未找到礼物模型", script)
 
 
 if __name__ == "__main__":

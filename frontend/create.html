@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>规则化输入采集</title>
+    <title>生日礼物模型定制</title>
     <style>
       :root {
         color-scheme: light;
@@ -93,7 +93,7 @@
       .panel {
         background: var(--panel);
         border: 1px solid var(--line);
-        border-radius: 14px;
+        border-radius: 8px;
         padding: 20px;
         box-shadow: 0 20px 42px rgba(15, 23, 42, 0.08);
       }
@@ -103,6 +103,10 @@
       form {
         display: grid;
         gap: 14px;
+      }
+
+      .summary-grid {
+        align-content: start;
       }
 
       .field-grid {
@@ -123,7 +127,7 @@
       textarea {
         width: 100%;
         border: 1px solid #cbd5e1;
-        border-radius: 10px;
+        border-radius: 8px;
         padding: 10px 12px;
         background: #fff;
         color: var(--ink);
@@ -149,7 +153,7 @@
 
       .step-card {
         border: 1px solid #dbe4ee;
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 14px;
         background: #f8fafc;
       }
@@ -166,7 +170,7 @@
       .handoff {
         display: grid;
         gap: 10px;
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 14px;
         background: var(--soft);
         border: 1px solid #bae6dd;
@@ -184,8 +188,8 @@
     <main id="screenshot-create-page">
       <div class="topbar">
         <div>
-          <p class="eyebrow">规则化输入采集</p>
-          <h1>角色资料配置</h1>
+          <p class="eyebrow">生日礼物模型定制</p>
+          <h1>为 TA 生成 3D 可预览纪念模型</h1>
         </div>
         <nav class="site-nav" data-nav-root data-nav-page="home" aria-label="主导航">
           <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
@@ -199,17 +203,35 @@
         <section class="panel">
           <form id="rule-input-form">
             <div>
-              <h2>输入角色基础档案</h2>
-              <p class="muted">该页面只负责采集规则化输入，并将字段整理为后端任务请求。</p>
+              <h2>礼物对象与心意</h2>
+              <p class="muted">输入生日、关系、风格和祝福意图，生成可保存、可预览、可下载 GLB 的个性化礼物模型。</p>
             </div>
 
             <div class="field-grid">
               <label>
-                展示名称
-                <input id="display-name" name="display_name" value="Ling Yuan RealChain" />
+                收礼人昵称
+                <input id="display-name" name="display_name" value="Ling Yuan" />
               </label>
               <label>
-                性别
+                场合
+                <select id="occasion" name="occasion">
+                  <option value="birthday" selected>生日</option>
+                  <option value="graduation">毕业</option>
+                  <option value="anniversary">纪念日</option>
+                  <option value="friendship">友情</option>
+                </select>
+              </label>
+              <label>
+                你们的关系
+                <select id="relationship" name="relationship">
+                  <option value="friend" selected>朋友</option>
+                  <option value="partner">伴侣</option>
+                  <option value="family">家人</option>
+                  <option value="classmate">同学</option>
+                </select>
+              </label>
+              <label>
+                性别呈现
                 <select id="gender" name="gender">
                   <option value="female" selected>女</option>
                   <option value="male">男</option>
@@ -217,50 +239,58 @@
                 </select>
               </label>
               <label>
-                出生地点
+                出生城市
                 <input id="birth-location" name="birth_location" value="Shanghai" />
               </label>
               <label>
-                出生时间
+                生日 / 出生时间
                 <input id="birth-datetime" name="birth_datetime" type="datetime-local" value="1995-06-15T09:30" />
+              </label>
+              <label>
+                最喜欢的颜色
+                <input id="favorite-color" name="favorite_color" value="teal" />
+              </label>
+              <label>
+                参考图片 URL
+                <input id="reference-image-url" name="reference_image_url" value="https://example.com/reference.png" />
               </label>
             </div>
 
             <label>
-              参考图片 URL
-              <input id="reference-image-url" name="reference_image_url" value="https://example.com/reference.png" />
+              礼物祝福
+              <textarea id="gift-message">愿你在新的一岁里保持明亮、笃定和自由。</textarea>
             </label>
 
             <section class="form-grid" aria-labelledby="fashion-heading">
-              <h3 id="fashion-heading">外在风格</h3>
+              <h3 id="fashion-heading">礼物主模型风格</h3>
               <div class="chips">
-                <label><input type="radio" name="fashion-style-option" value="minimalist" />极简风</label>
-                <label><input type="radio" name="fashion-style-option" value="modern_casual" checked />现代休闲</label>
-                <label><input type="radio" name="fashion-style-option" value="business_commute" />通勤商务</label>
-                <label><input type="radio" name="fashion-style-option" value="vintage_elegant" />复古优雅</label>
-                <label><input type="radio" name="fashion-style-option" value="techwear" />机能风</label>
+                <label><input type="radio" name="fashion-style-option" value="cute_keepsake" />可爱纪念</label>
+                <label><input type="radio" name="fashion-style-option" value="elegant_collectible" checked />优雅收藏</label>
+                <label><input type="radio" name="fashion-style-option" value="cyber_fantasy" />赛博幻想</label>
+                <label><input type="radio" name="fashion-style-option" value="oriental_symbol" />东方象征</label>
+                <label><input type="radio" name="fashion-style-option" value="minimal_desk_ornament" />桌面摆件</label>
               </div>
-              <input id="fashion-style" name="fashion_style" value="modern_casual, clean silhouette, teal jacket, white sneakers" />
+              <input id="fashion-style" name="fashion_style" value="elegant_collectible, clean silhouette, teal accent, stable standing pose" />
             </section>
 
             <section class="form-grid" aria-labelledby="spirit-heading">
-              <h3 id="spirit-heading">内在气质</h3>
+              <h3 id="spirit-heading">象征陪伴摆件</h3>
               <div class="chips">
                 <label><input type="radio" name="spirit-style-option" value="eastern_classical" checked />东方古韵</label>
                 <label><input type="radio" name="spirit-style-option" value="fire_cyberpunk" />火系赛博</label>
                 <label><input type="radio" name="spirit-style-option" value="water_dreamlike" />水光梦境</label>
                 <label><input type="radio" name="spirit-style-option" value="earth_balance" />大地平衡</label>
               </div>
-              <input id="spirit-style" name="spirit_style" value="eastern_classical, water light aura, balanced guardian motif" />
+              <input id="spirit-style" name="spirit_style" value="eastern_classical, water light aura, compact guardian ornament" />
             </section>
 
             <label>
-              生成补充说明
-              <textarea id="extra-note">强调轻量化三维角色、清晰服饰层次和可在 Web 查看器中展示的 GLB 资源。</textarea>
+              个性关键词
+              <textarea id="extra-note">温柔、观察力强、喜欢清爽层次。模型需要轮廓完整、结构稳定、适合 GLB 预览。</textarea>
             </label>
 
             <div class="actions">
-              <button class="primary" id="submit-task" type="submit">提交生成任务</button>
+              <button class="primary" id="submit-task" type="submit">生成礼物模型</button>
               <button id="fill-demo" type="button">恢复演示数据</button>
             </div>
           </form>
@@ -268,24 +298,24 @@
 
         <aside class="panel summary-grid">
           <div>
-            <h2>字段映射预览</h2>
-              <p class="muted">该侧栏展示输入数据如何进入任务创建接口。</p>
+            <h2>礼物方案预览</h2>
+            <p class="muted">当前字段会复用既有任务接口，并把礼物语义写入 extra_payload。</p>
           </div>
           <div class="step-card">
-            <strong>1. 基础档案</strong>
-            <p id="profile-summary" class="muted">展示名称、性别、出生地和出生时间将写入 input profile。</p>
+            <strong>1. 对象信息</strong>
+            <p id="profile-summary" class="muted">昵称、关系、生日和城市会进入 input profile。</p>
           </div>
           <div class="step-card">
-            <strong>2. 风格画像</strong>
-            <p id="style-summary" class="muted">外在风格与内在气质将映射到 style_profile。</p>
+            <strong>2. 风格方向</strong>
+            <p id="style-summary" class="muted">主模型与陪伴摆件风格会映射到 style_profile。</p>
           </div>
           <div class="step-card">
-            <strong>3. 任务请求</strong>
-            <p id="submit-status" class="muted">点击提交后调用 /api/tasks 创建生成任务。</p>
+            <strong>3. 生成任务</strong>
+            <p id="submit-status" class="muted">提交后调用 /api/tasks 创建生日礼物模型任务。</p>
           </div>
           <div class="handoff">
-            <strong>提交去向</strong>
-            <p class="muted">确认信息后，系统会创建生成任务并进入任务跟踪流程。</p>
+            <strong>产物去向</strong>
+            <p class="muted">完成后可进入任务页、查看器和画廊，预览并下载 GLB 模型。</p>
           </div>
         </aside>
       </div>

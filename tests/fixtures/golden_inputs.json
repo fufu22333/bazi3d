@@ -12,14 +12,20 @@
       "extra_payload": {
         "personality_tags": ["calm", "observant"],
         "scene_preference": "misty lakeside",
-        "free_text": "soft silhouette with layered accessories"
+        "free_text": "soft silhouette with layered accessories",
+        "occasion": "birthday",
+        "relationship": "friend",
+        "gift_message": "May this year feel bright and calm.",
+        "favorite_color": "teal"
       }
     },
     "expected_prompt_fragments": [
       "Aster",
       "modern casual",
       "dreamy water",
-      "misty lakeside"
+      "misty lakeside",
+      "personalized 3D keepsake figure",
+      "symbolic guardian ornament"
     ],
     "mock_llm_response": {
       "version": "v1",
@@ -52,14 +58,20 @@
       "extra_payload": {
         "personality_tags": ["decisive", "focused"],
         "scene_preference": "temple courtyard",
-        "free_text": "ornamental sleeves and ceremonial posture"
+        "free_text": "ornamental sleeves and ceremonial posture",
+        "occasion": "birthday",
+        "relationship": "classmate",
+        "gift_message": "Celebrate a brave new chapter.",
+        "favorite_color": "ember red"
       }
     },
     "expected_prompt_fragments": [
       "Yan",
       "ritual formal",
       "ember phoenix",
-      "temple courtyard"
+      "temple courtyard",
+      "birthday",
+      "ember red"
     ],
     "mock_llm_response": {
       "version": "v1",
@@ -92,14 +104,20 @@
       "extra_payload": {
         "personality_tags": ["gentle", "grounded"],
         "scene_preference": "mossy forest path",
-        "free_text": "natural fibers and hand-crafted details"
+        "free_text": "natural fibers and hand-crafted details",
+        "occasion": "birthday",
+        "relationship": "family",
+        "gift_message": "A warm keepsake for steady joy.",
+        "favorite_color": "forest green"
       }
     },
     "expected_prompt_fragments": [
       "Lin",
       "earth artisan",
       "forest guardian",
-      "mossy forest path"
+      "mossy forest path",
+      "stable standing pose",
+      "avoid ultra-thin floating details"
     ],
     "mock_llm_response": {
       "version": "v1",

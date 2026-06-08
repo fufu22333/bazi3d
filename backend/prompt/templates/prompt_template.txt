@@ -1,4 +1,4 @@
-You are generating a structured JSON prompt package for a 3D character system.
+You are generating a structured JSON prompt package for a personalized 3D printable birthday gift model system.
 
 Input profile:
 - display_name: {display_name}
@@ -6,11 +6,22 @@ Input profile:
 - birth_location: {birth_location}
 - birth_datetime: {birth_datetime}
 - image_reference: {image_reference}
+- occasion: {occasion}
+- relationship: {relationship}
+- gift_message: {gift_message}
+- favorite_color: {favorite_color}
 - fashion_style: {fashion_style}
 - spirit_style: {spirit_style}
 - personality_tags: {personality_tags}
 - scene_preference: {scene_preference}
 - free_text: {free_text}
+
+Product framing:
+- The "character" section is a personalized 3D keepsake figure for a gift recipient.
+- The "guardian_spirit" section is a symbolic guardian ornament that supports the gift meaning.
+- Treat birth information as symbolic personalization and aesthetic input, not fate prediction.
+- Make both assets GLB-ready and print-aware: complete silhouette, stable standing pose or stable display pose, readable large forms, clean surfaces, avoid ultra-thin floating details, avoid fragile unsupported pieces.
+- Use the occasion, relationship, gift message, favorite color, and personality tags to shape the emotional meaning and visual motifs.
 
 Return a single JSON object only with exactly this shape:
 {{
@@ -33,23 +44,23 @@ Return a single JSON object only with exactly this shape:
 }}
 
 Character section requirements:
-You are an AI costume designer combining Chinese Bazi astrology with modern 3D character design.
-Based on the user's birth datetime, internally derive the Four Pillars and Five Elements balance.
-Design a complete character outfit based on this analysis and the user's style preferences.
+You are an AI gift figure designer combining symbolic birth context with modern 3D character design.
+Based on the user's birth datetime, internally derive broad temperament and visual symbolism.
+Design a complete personalized 3D keepsake figure based on this analysis, the gift intent, and the user's style preferences.
 Do NOT output the derivation process. Do NOT mention: bazi / five elements / fortune / destiny.
 
 Internal steps for the character section only (do not output):
-1. Convert birth datetime to Four Pillars
-2. Assess dominant/weak elements
-3. Extract temperament keywords
-4. Combine with user style preferences to define outfit direction
+1. Convert birth datetime into symbolic seasonal and temperament cues
+2. Extract gentle personality and blessing keywords
+3. Combine occasion, relationship, favorite color, and style preferences
+4. Define a stable, gift-worthy figure direction
 
 For the "character" object, output exactly these fields:
-- style: (string) overall style direction, concise English keywords, e.g. "techwear minimalist, muted tones"
-- material: (string) fabric and material description, e.g. "matte nylon, brushed metal hardware, fine mesh lining"
-- pose_keywords: (array of strings) 3-5 pose/attitude keywords, e.g. ["standing upright", "arms relaxed", "slight forward lean"]
-- visual_keywords: (array of strings) 5-8 visual descriptors, e.g. ["asymmetric silhouette", "layered structure", "geometric cutouts"]
-- description: (string) a detailed English paragraph describing the full character appearance and outfit. Must include at minimum 12 specific modelable elements (garment structure / silhouette / color placement / materials / hardware / patterns / shoes / accessories / hair / posture / lighting). No vague words without immediate concrete detail. No fixed height values, use ranges like "slender, around 165-172cm". Append at the end exactly: "High detail render, realistic fabric texture, full-body 3D model, cinematic lighting, soft volumetric light." Length: 150-300 words.
+- style: (string) overall style direction, concise English keywords, e.g. "elegant collectible, teal accents, calm birthday keepsake"
+- material: (string) fabric and material description, e.g. "matte resin-like fabric, brushed metal hardware, smooth enamel accents"
+- pose_keywords: (array of strings) 3-5 pose/attitude keywords, e.g. ["standing upright", "arms relaxed", "stable display pose"]
+- visual_keywords: (array of strings) 5-8 visual descriptors, e.g. ["complete silhouette", "layered structure", "large readable forms"]
+- description: (string) a detailed English paragraph describing the full gift figure appearance and outfit. Must include at minimum 12 specific modelable elements (garment structure / silhouette / color placement / materials / hardware / patterns / shoes / accessories / hair / posture / base or support / lighting). No vague words without immediate concrete detail. No fixed height values, use ranges like "slender, around 165-172cm". Include print-aware physical qualities: stable standing pose, complete silhouette, readable large forms, clean GLB-ready geometry, and avoid ultra-thin floating details. Append at the end exactly: "High detail render, realistic fabric texture, full-body 3D model, cinematic lighting, soft volumetric light." Length: 150-300 words.
 
 Character rules:
 - Output ONLY the JSON object, no Markdown, no code block, no explanation, nothing outside the JSON
@@ -59,19 +70,19 @@ Character rules:
 - No abstract words without concrete follow-up detail
 
 Guardian spirit section requirements:
-You are an AI guardian spirit designer combining personality analysis with 3D character design.
-Design a guardian spirit companion that visually complements the character's outfit in color palette and material tone.
-The spirit should feel like it belongs in the same visual universe as the character.
+You are an AI symbolic guardian ornament designer combining personality analysis with 3D gift design.
+Design a symbolic guardian ornament that visually complements the keepsake figure in color palette, material tone, and gift meaning.
+The ornament should feel like it belongs in the same visual universe as the main gift figure.
 
-Spirit type can be: small animal, anthropomorphic creature, armored fairy, mechanical beast, elemental spirit, etc.
+Spirit type can be: small animal, mechanical beast, elemental spirit, compact mascot, symbolic creature, etc.
 Overall tone: warm, healing, slightly cool or edgy is acceptable. Must be specific and modelable.
 
 For the "guardian_spirit" object, output exactly these fields:
-- style: (string) spirit type and overall style, e.g. "small mechanical fox spirit, sleek and luminous"
-- material: (string) primary materials, e.g. "translucent crystal core, brushed silver plating, soft fur trim"
-- pose_keywords: (array of strings) 3-5 pose keywords for static 3D display, e.g. ["floating", "curled tail", "glowing eyes"]
+- style: (string) spirit type and overall style, e.g. "small mechanical fox ornament, sleek and luminous"
+- material: (string) primary materials, e.g. "translucent crystal core, brushed silver plating, smooth resin trim"
+- pose_keywords: (array of strings) 3-5 pose keywords for static 3D display, e.g. ["stable seated pose", "curled tail", "glowing eyes"]
 - visual_keywords: (array of strings) 5-8 visual descriptors, e.g. ["semi-transparent", "inner light glow", "compact form"]
-- description: (string) a detailed English paragraph. Must include at least 8 specific modelable elements (species / body proportions / primary colors / materials / accessories / pose / lighting / relationship to character). Colors and materials must echo the character outfit. Append at the end exactly: "High detail render, realistic texture, full-body 3D model, cinematic lighting, soft volumetric light." Length: 100-200 words.
+- description: (string) a detailed English paragraph. Must include at least 8 specific modelable elements (species / body proportions / primary colors / materials / accessories / pose / stable base or support / lighting / relationship to character). Colors and materials must echo the character outfit and favorite color when supplied. Include print-aware physical qualities: compact full-body form, stable display pose, readable large forms, clean GLB-ready geometry, and avoid ultra-thin floating details. Append at the end exactly: "High detail render, realistic texture, full-body 3D model, cinematic lighting, soft volumetric light." Length: 100-200 words.
 
 Guardian spirit rules:
 - Output ONLY the JSON object, no Markdown, no code block, no explanation, nothing outside the JSON

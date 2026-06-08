@@ -30,6 +30,10 @@ def build_prompt(input_profile: dict) -> str:
         personality_tags=", ".join(extra_payload.get("personality_tags", [])),
         scene_preference=extra_payload.get("scene_preference", ""),
         free_text=extra_payload.get("free_text", ""),
+        occasion=extra_payload.get("occasion", "birthday"),
+        relationship=extra_payload.get("relationship", ""),
+        gift_message=extra_payload.get("gift_message", ""),
+        favorite_color=extra_payload.get("favorite_color", ""),
     )
 
 

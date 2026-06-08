@@ -2,6 +2,8 @@
 
 Bazi3D is an experimental full-stack web project that explores turning structured user input into stylized 3D character content. The project is currently in demo / development stage, with a Flask backend, a static multi-page frontend, and a growing set of automated tests.
 
+The current product repositioning is moving the demo toward a more concrete use case: generating a personalized, 3D-previewable birthday gift model from birth context, relationship, style preferences, and gift intent. See `docs/product/birthday-gift-model-refactor-plan.md` for the lightweight refactor plan.
+
 ## Project Overview
 
 The current version focuses on a V1 exploration workflow:
@@ -60,6 +62,7 @@ Then update `.env` with your own local values, for example:
 
 - `SQLALCHEMY_DATABASE_URI` or MySQL connection fields
 - `JWT_SECRET_KEY`
+- `CORS_ALLOWED_ORIGINS`
 - optional provider keys such as `DEEPSEEK_API_KEY`, `MESHY_API_KEY`, `TENCENTCLOUD_SECRET_ID`, `TENCENTCLOUD_SECRET_KEY`
 
 ### 3. Initialize the database
@@ -82,13 +85,15 @@ Default local entry points:
 ## Known Issues / Notes
 
 - This repository is currently in development and may contain incomplete flows or placeholder behavior.
-- `backend/config.py` includes development-oriented fallback values such as `MYSQL_PASSWORD=123456` and `JWT_SECRET_KEY=dev-secret-key`. These are for local development only and must not be used in production.
-- CORS is currently configured as `*` for `/api/*`, which is convenient for development but too permissive for production deployment.
+- `backend/config.py` includes development-oriented fallback values such as `JWT_SECRET_KEY=dev-secret-key`. These are for local development only. When `APP_ENV=production`, production deployment must provide an explicit `JWT_SECRET_KEY`.
+- CORS defaults to `*` for local development. When `APP_ENV=production`, deployment must provide explicit `CORS_ALLOWED_ORIGINS`.
 - Frontend auth tokens are currently stored in `localStorage`, which is acceptable for prototyping but not ideal for stronger security requirements.
+- Phase 3 release runbooks, legal readiness, beta operations, export, and deletion notes live in `docs/product/`.
 - `.env`, local virtual environments, IDE metadata, caches, generated screenshots, private documents, and local output artifacts should remain untracked in public pushes.
 
 ## Roadmap
 
+- Reframe the V1 experience around personalized birthday gift model customization.
 - Continue improving frontend page consistency and navigation flow
 - Strengthen the end-to-end generation pipeline from user input to result display
 - Improve environment separation and deployment readiness
