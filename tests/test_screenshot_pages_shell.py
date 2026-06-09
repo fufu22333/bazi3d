@@ -19,7 +19,7 @@ class ScreenshotPagesShellTestCase(unittest.TestCase):
                 'id="screenshot-task-page"',
                 'id="task-timeline"',
                 "./js/task-page.js",
-                "生成任务",
+                "礼物模型生成进度",
             ),
             "viewer.html": (
                 'id="screenshot-viewer-page"',

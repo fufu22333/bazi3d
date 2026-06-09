@@ -120,9 +120,25 @@ async function loadGallery() {
   try {
     const payload = await fetchWorks();
     renderWorks(payload.items);
-  } catch (error) {
-    statusNode.textContent = "加载公开礼物模型失败。";
-    console.error(error);
+  } catch {
+    statusNode.textContent = "暂时没有可展示的公开礼物模型，可先查看演示作品详情。";
+    listNode.classList.remove("gallery-grid");
+    listNode.innerHTML = "";
+    const fallback = document.createElement("article");
+    fallback.className = "work-card";
+    const title = document.createElement("h2");
+    const detail = document.createElement("p");
+    const actions = document.createElement("div");
+    const link = document.createElement("a");
+    detail.className = "muted";
+    actions.className = "work-actions";
+    title.textContent = "演示礼物模型";
+    detail.textContent = "本地演示环境没有公开作品时，可以查看预置的生日礼物模型详情页。";
+    link.href = "./work.html?demo=1";
+    link.textContent = "查看演示详情";
+    actions.append(link);
+    fallback.append(title, detail, actions);
+    listNode.append(fallback);
   }
 }
 
