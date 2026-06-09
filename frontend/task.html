@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>生成任务跟踪</title>
+    <title>礼物模型生成进度</title>
     <style>
       :root {
         color-scheme: light;
@@ -174,8 +174,8 @@
     <main id="screenshot-task-page">
       <div class="topbar">
         <div>
-          <p class="eyebrow">生成任务跟踪</p>
-          <h1>任务生命周期与资源状态</h1>
+          <p class="eyebrow">礼物模型任务</p>
+          <h1>礼物模型生成进度</h1>
         </div>
         <nav class="site-nav" data-nav-root data-nav-page="home" aria-label="主导航">
           <a class="site-nav__link" data-nav-link="home" href="./index.html">首页</a>
@@ -190,7 +190,7 @@
           <div class="toolbar">
             <div>
               <h2 id="task-title">任务 #13</h2>
-              <p id="task-status" class="muted">已完成，人物模型资源已返回。</p>
+              <p id="task-status" class="muted">已完成，礼物模型资源已返回。</p>
             </div>
             <label>
               <span class="muted">任务 ID</span>
@@ -217,27 +217,27 @@
         </section>
 
         <section class="panel">
-          <h2>处理过程</h2>
+          <h2>礼物模型生成过程</h2>
           <div id="task-timeline" aria-live="polite">
             <article class="timeline-item">
               <span class="dot"></span>
               <div>
-                <h3>提交规则化输入</h3>
-                <p class="muted">前端将基础资料与风格画像提交到 /api/tasks。</p>
+                <h3>提交礼物定制输入</h3>
+                <p class="muted">前端将生日背景、关系、祝福和风格偏好提交到 /api/tasks。</p>
               </div>
             </article>
             <article class="timeline-item">
               <span class="dot"></span>
               <div>
-                <h3>生成提示文本</h3>
-                <p class="muted">后端根据 input profile 组织人物与守护灵生成提示。</p>
+                <h3>生成礼物语义 Prompt</h3>
+                <p class="muted">后端根据 input profile 组织礼物模型与守护摆件生成提示。</p>
               </div>
             </article>
             <article class="timeline-item">
               <span class="dot"></span>
               <div>
-                <h3>返回模型资源</h3>
-                <p class="muted">任务完成后返回可供查看器加载的 GLB 资源地址。</p>
+                <h3>返回礼物模型资源</h3>
+                <p class="muted">任务完成后返回可供查看器加载的 GLB 礼物模型资源地址。</p>
               </div>
             </article>
           </div>
@@ -247,12 +247,12 @@
           <h2>资源输出</h2>
           <div id="asset-list" class="asset-list">
             <article class="asset-card">
-              <h3>人物模型</h3>
-              <p class="muted">character.glb - 用于模型查看器加载人物形象。</p>
+              <h3>礼物模型</h3>
+              <p class="muted">character.glb - 用于模型查看器加载生日纪念主体。</p>
             </article>
             <article class="asset-card">
-              <h3>守护灵模型</h3>
-              <p class="muted">guardian.glb - 用于展示扩展生成结果。</p>
+              <h3>守护摆件</h3>
+              <p class="muted">guardian.glb - 用于展示象征祝福的扩展生成结果。</p>
             </article>
           </div>
         </section>
@@ -260,7 +260,7 @@
         <aside class="panel">
           <div class="status-banner">
             <h2>状态说明</h2>
-            <p class="muted">任务完成后，人物模型和守护灵模型会作为资源输出，供查看器加载。</p>
+            <p class="muted">任务完成后，礼物模型和守护摆件会作为资源输出，供查看器加载。</p>
           </div>
         </aside>
       </div>

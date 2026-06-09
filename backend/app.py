@@ -64,6 +64,10 @@ def create_app(test_config: dict | None = None) -> Flask:
     def health() -> tuple:
         return jsonify({"status": "ok"}), 200
 
+    @app.get("/favicon.ico")
+    def favicon():
+        return "", 204
+
     @app.route("/frontend/<path:filename>")
     def serve_frontend(filename: str):
         return serve_frontend_file(filename)
@@ -74,7 +78,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     @app.route("/app")
     def serve_index():
-        return serve_frontend_file("index.html")
+        return serve_frontend_file("create.html")
 
     @app.teardown_appcontext
     def remove_session(exception=None) -> None:

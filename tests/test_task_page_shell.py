@@ -76,6 +76,17 @@ class TaskPageShellSmokeTestCase(unittest.TestCase):
         self.assertIn("updateReturnToCreateLink", task_script)
         self.assertIn('data-nav-link="home"', task_script)
 
+    def test_task_status_page_uses_gift_model_copy(self) -> None:
+        html = Path("frontend/task.html").read_text(encoding="utf-8")
+        script = Path("frontend/js/task-page.js").read_text(encoding="utf-8")
+
+        self.assertIn("礼物模型生成进度", html)
+        self.assertIn("礼物模型", html)
+        self.assertIn("守护摆件", html)
+        self.assertIn("生成礼物语义 Prompt", html)
+        self.assertIn("礼物模型资源", script)
+        self.assertIn("守护摆件", script)
+
 
 if __name__ == "__main__":
     unittest.main()

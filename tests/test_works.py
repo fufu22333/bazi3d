@@ -1,4 +1,7 @@
 import unittest
+from unittest.mock import patch
+
+from sqlalchemy.exc import SQLAlchemyError
 
 
 class WorkApiTestCase(unittest.TestCase):
@@ -164,6 +167,14 @@ class WorkApiTestCase(unittest.TestCase):
             payload["items"][0]["asset"]["url"],
             "https://example.com/models/public.glb",
         )
+
+    def test_list_works_returns_empty_items_when_public_gallery_store_unavailable(self) -> None:
+        with patch("backend.routes.works.list_public_works", side_effect=SQLAlchemyError("offline")):
+            response = self.client.get("/api/works")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertEqual(payload["items"], [])
 
     def test_get_public_work_detail_returns_minimum_readonly_fields(self) -> None:
         asset_id = self._import_asset(

@@ -1,4 +1,5 @@
 from flask import Blueprint, g, jsonify, request
+from sqlalchemy.exc import SQLAlchemyError
 
 from backend.routes.auth import get_optional_auth_user, require_auth
 from backend.services.guardrails import (
@@ -43,7 +44,10 @@ def create_work():
 
 @works_bp.get("")
 def list_works():
-    items = [serialize_work(work) for work in list_public_works()]
+    try:
+        items = [serialize_work(work) for work in list_public_works()]
+    except SQLAlchemyError:
+        items = []
     return jsonify({"items": items}), 200
 
 

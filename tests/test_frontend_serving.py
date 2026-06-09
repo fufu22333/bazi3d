@@ -8,12 +8,14 @@ class FrontendServingTestCase(unittest.TestCase):
         self.app = create_app({"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite://"})
         self.client = self.app.test_client()
 
-    def test_app_route_serves_frontend_index(self) -> None:
+    def test_app_route_serves_gift_customization_entry(self) -> None:
         response = self.client.get("/app")
         try:
             self.assertEqual(response.status_code, 200)
             self.assertIn("text/html", response.content_type)
-            self.assertIn('id="task-form"', response.get_data(as_text=True))
+            html = response.get_data(as_text=True)
+            self.assertIn("生日礼物模型定制", html)
+            self.assertIn('id="rule-input-form"', html)
         finally:
             response.close()
 
@@ -23,6 +25,13 @@ class FrontendServingTestCase(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("javascript", response.content_type)
             self.assertIn("requestJson", response.get_data(as_text=True))
+        finally:
+            response.close()
+
+    def test_favicon_request_does_not_log_missing_resource(self) -> None:
+        response = self.client.get("/favicon.ico")
+        try:
+            self.assertEqual(response.status_code, 204)
         finally:
             response.close()
 

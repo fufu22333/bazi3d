@@ -31,22 +31,22 @@ function updateReturnToCreateLink(taskId) {
   if (!homeLink || !taskId) {
     return;
   }
-  homeLink.href = `./index.html?taskId=${encodeURIComponent(taskId)}`;
+  homeLink.href = `./create.html?taskId=${encodeURIComponent(taskId)}`;
 }
 
 function renderTimeline(status) {
   const items = [
-    ["提交规则化输入", "前端将基础资料与风格画像提交到 /api/tasks。", "completed"],
+    ["提交礼物定制输入", "前端将生日背景、关系、祝福和风格偏好提交到 /api/tasks。", "completed"],
     [
-      "生成提示文本",
-      "后端根据 input profile 组织人物与守护灵生成提示。",
+      "生成礼物语义 Prompt",
+      "后端根据 input profile 组织礼物模型与守护摆件生成提示。",
       status === "failed" ? "idle" : "completed",
     ],
     [
-      "返回模型资源",
+      "返回礼物模型资源",
       status === "completed"
-        ? "任务完成后返回可供查看器加载的 GLB 资源地址。"
-        : "任务处理中，模型资源仍在等待返回。",
+        ? "任务完成后返回可供查看器加载的 GLB 礼物模型资源地址。"
+        : "任务处理中，礼物模型资源仍在等待返回。",
       status === "completed" ? "completed" : "pending",
     ],
   ];
@@ -75,7 +75,7 @@ function renderAssets(assets = []) {
     assetListNode.innerHTML = `
       <article class="asset-card">
         <h3>等待资源</h3>
-        <p class="muted">当前任务尚未返回可展示的模型资源。</p>
+        <p class="muted">当前任务尚未返回可展示的礼物模型资源。</p>
       </article>
     `;
     return;
@@ -89,11 +89,11 @@ function renderAssets(assets = []) {
       const detail = document.createElement("p");
       const link = document.createElement("a");
       detail.className = "muted";
-      title.textContent = asset.type === "guardian" ? "守护灵模型" : "人物模型";
+      title.textContent = asset.type === "guardian" ? "守护摆件" : "礼物模型";
       detail.textContent = `${asset.file_format || "glb"} - ${asset.url || "暂无资源地址"}`;
       if (asset.url) {
         link.href = `./viewer.html?personUrl=${encodeURIComponent(asset.url)}`;
-        link.textContent = "在模型查看页打开";
+        link.textContent = "在礼物模型查看页打开";
       }
       card.append(title, detail);
       if (asset.url) {
@@ -164,7 +164,7 @@ async function loadTask() {
     return;
   }
 
-  taskStatusNode.textContent = `正在查询任务 #${taskId}...`;
+  taskStatusNode.textContent = `正在查询礼物模型任务 #${taskId}...`;
   try {
     const task = await fetchTask(token, taskId);
     renderTask(task);
@@ -174,7 +174,7 @@ async function loadTask() {
       stopTaskPolling();
     }
   } catch (error) {
-    taskStatusNode.textContent = error.message || "任务查询失败，已显示演示状态。";
+    taskStatusNode.textContent = error.message || "任务查询失败，已显示礼物模型演示状态。";
     renderDemoTask();
   }
 }
